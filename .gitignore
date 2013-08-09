@@ -1,0 +1,4 @@
+*.pyc
+/build
+/docs/_build
+/python_bioformats.egg-info
