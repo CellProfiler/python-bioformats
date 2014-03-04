@@ -8,7 +8,7 @@ import bioformats
 
 import bioformats.formatreader as formatreader
 import bioformats.metadatatools as metadatatools
-from bioformats import load_using_bioformats
+from bioformats import load_image
 from bioformats import log4j
 
 class TestLoadUsingBioformats(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestLoadUsingBioformats(unittest.TestCase):
 
     def test_load_using_bioformats(self):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
-        image, scale = load_using_bioformats(path, rescale=False,
-                                             wants_max_intensity=True)
+        image, scale = load_image(path, rescale=False,
+                                  wants_max_intensity=True)
         print image.shape
 

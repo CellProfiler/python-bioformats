@@ -5,7 +5,7 @@ but this file is licensed under the more permissive BSD license.
 See the accompanying file LICENSE for details.
 
 Copyright (c) 2003-2009 Massachusetts Institute of Technology
-Copyright (c) 2009-2013 Broad Institute
+Copyright (c) 2009-2014 Broad Institute
 All rights reserved.
 
 Please see the AUTHORS file for credits.
@@ -221,19 +221,20 @@ def make_pixel_type_class():
     if __pixel_type_class is None:
         class PixelType(object):
             '''Provide enums from ome.xml.model.enums.PixelType'''
-            klass = jutil.get_env().find_class('ome/xml/model/enums/PixelType')
-            INT8 = jutil.get_static_field(klass, 'INT8', 'Lome/xml/model/enums/PixelType;')
-            INT16 = jutil.get_static_field(klass, 'INT16', 'Lome/xml/model/enums/PixelType;')
-            INT32 = jutil.get_static_field(klass, 'INT32', 'Lome/xml/model/enums/PixelType;')
-            UINT8 = jutil.get_static_field(klass, 'UINT8', 'Lome/xml/model/enums/PixelType;')
-            UINT16 = jutil.get_static_field(klass, 'UINT16', 'Lome/xml/model/enums/PixelType;')
-            UINT32 = jutil.get_static_field(klass, 'UINT32', 'Lome/xml/model/enums/PixelType;')
-            FLOAT = jutil.get_static_field(klass, 'FLOAT', 'Lome/xml/model/enums/PixelType;')
-            BIT = jutil.get_static_field(klass, 'BIT', 'Lome/xml/model/enums/PixelType;')
-            DOUBLE = jutil.get_static_field(klass, 'DOUBLE', 'Lome/xml/model/enums/PixelType;')
-            COMPLEX = jutil.get_static_field(klass, 'COMPLEX', 'Lome/xml/model/enums/PixelType;')
-            DOUBLECOMPLEX = jutil.get_static_field(klass, 'DOUBLECOMPLEX', 'Lome/xml/model/enums/PixelType;')
-        __pixel_type_class = PixelType()
+            def __init__(self):
+                klass = jutil.get_env().find_class('ome/xml/model/enums/PixelType')
+                self.INT8 = jutil.get_static_field(klass, 'INT8', 'Lome/xml/model/enums/PixelType;')
+                self.INT16 = jutil.get_static_field(klass, 'INT16', 'Lome/xml/model/enums/PixelType;')
+                self.INT32 = jutil.get_static_field(klass, 'INT32', 'Lome/xml/model/enums/PixelType;')
+                self.UINT8 = jutil.get_static_field(klass, 'UINT8', 'Lome/xml/model/enums/PixelType;')
+                self.UINT16 = jutil.get_static_field(klass, 'UINT16', 'Lome/xml/model/enums/PixelType;')
+                self.UINT32 = jutil.get_static_field(klass, 'UINT32', 'Lome/xml/model/enums/PixelType;')
+                self.FLOAT = jutil.get_static_field(klass, 'FLOAT', 'Lome/xml/model/enums/PixelType;')
+                self.BIT = jutil.get_static_field(klass, 'BIT', 'Lome/xml/model/enums/PixelType;')
+                self.DOUBLE = jutil.get_static_field(klass, 'DOUBLE', 'Lome/xml/model/enums/PixelType;')
+                self.COMPLEX = jutil.get_static_field(klass, 'COMPLEX', 'Lome/xml/model/enums/PixelType;')
+                self.DOUBLECOMPLEX = jutil.get_static_field(klass, 'DOUBLECOMPLEX', 'Lome/xml/model/enums/PixelType;')
+        __pixel_type_class = PixelType
     return __pixel_type_class
 
 MINIMUM = 'MINIMUM'

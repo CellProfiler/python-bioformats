@@ -16,8 +16,8 @@ __version__ = "$Revision$"
 
 import os.path
 import javabridge
-import formatreader as _formatreader
-import formatwriter as _formatwriter
+from . import formatreader as _formatreader
+from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
@@ -38,8 +38,6 @@ READABLE_FORMATS = ('al3d', 'am', 'amiramesh', 'apl', 'arf', 'avi', 'bmp',
 WRITABLE_FORMATS = ('avi', 'eps', 'epsi', 'ics', 'ids', 'jp2', 'jpeg', 'jpg', 
                     'mov', 'ome', 'ome.tiff', 'png', 'ps', 'tif', 'tiff')
 
-ImageReader = _formatreader.make_image_reader_class()
-FormatTools = _formatreader.make_format_tools_class()
 OMETiffWriter = _formatwriter.make_ome_tiff_writer_class()
 ChannelSeparator = _formatreader.make_reader_wrapper_class(
     "loci/formats/ChannelSeparator")
@@ -48,8 +46,15 @@ from .metadatatools import createOMEXMLMetadata as create_ome_xml_metadata
 from .metadatatools import wrap_imetadata_object
 import metadatatools as _metadatatools
 PixelType = _metadatatools.make_pixel_type_class()
+get_metadata_options = _metadatatools.get_metadata_options
 
 load_image = _formatreader.load_using_bioformats
+load_image_url = _formatreader.load_using_bioformats_url
+get_image_reader = _formatreader.get_image_reader
+release_image_reader = _formatreader.release_image_reader
+get_omexml_metadata = _formatreader.get_omexml_metadata
+
+from . import omexml
 
 def init_logger():
     javabridge.static_call("org/apache/log4j/BasicConfigurator",
