@@ -253,9 +253,9 @@ def make_text_node(parent, namespace, tag_name, text):
     set_text(node, text)
 
 class OMEXML(object):
-    '''The OMEXML class reads and writes OME-XML with methods to get and set it
+    '''Reads and writes OME-XML with methods to get and set it.
     
-    The OMEXML class has four main purposes - to parse OME-XML, to output
+    The OMEXML class has four main purposes: to parse OME-XML, to output
     OME-XML, to provide a structured mechanism for inspecting OME-XML and to
     let the caller create and modify OME-XML.
     
@@ -271,36 +271,33 @@ class OMEXML(object):
     where it's supported is to use properties on OMEXML and on some of its
     derived objects. For instance:
     
-    o = OMEXML()
-    print o.image().AcquiredDate
+    >>> o = OMEXML()
+    >>> print o.image().AcquiredDate
     
     will get you the date that image # 0 was acquired.
     
-    o = OMEXML()
+    >>> o = OMEXML()
+    >>> o.image().Name = "MyImage"
     
-    o.image().Name = "MyImage"
-    
-    will set the image name to "MyImage"
+    will set the image name to "MyImage".
     
     You can add and remove objects using the "count" properties. Each of these
     handles hooking up and removing orphaned elements for you and should be
     less error prone than creating orphaned elements and attaching them. For
     instance, to create a three-color image:
     
-    o = OMEXML()
+    >>> o = OMEXML()
+    >>> o.image().Pixels.channel_count = 3
+    >>> o.image().Pixels.Channel(0).Name = "Red"
+    >>> o.image().Pixels.Channel(1).Name = "Green"
+    >>> o.image().Pixels.Channel(2).Name = "Blue"
     
-    o.image().Pixels.channel_count = 3
-    
-    o.image().Pixels.Channel(0).Name = "Red"
-    
-    o.image().Pixels.Channel(1).Name = "Green"
-    
-    o.image().Pixels.Channel(2).Name = "Blue"
-    
-    You can view the OME-XML schema documentation online at:
-    http://git.openmicroscopy.org/src/develop/components/specification/Documentation/Generated/OME-2011-06/ome.html
+    See the `OME-XML schema documentation <http://git.openmicroscopy.org/src/develop/components/specification/Documentation/Generated/OME-2011-06/ome.html>`_.
+
     '''
-    def __init__(self, xml=default_xml):
+    def __init__(self, xml=None):
+        if xml is None:
+            xml = default_xml
         if isinstance(xml, unicode):
             xml = xml.encode("utf-8")
         self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
@@ -416,7 +413,16 @@ class OMEXML(object):
             
         @property
         def Pixels(self):
-            '''The OME/Image/Pixels element'''
+            '''The OME/Image/Pixels element.
+
+            Example:
+            >>> md = bioformats.omexml.OMEXML(xml)
+            >>> pixels = omemetadata.image(i).Pixels
+            >>> channel_count = pixels.SizeC
+            >>> stack_count = pixels.SizeZ
+            >>> timepoint_count = pixels.SizeT
+
+            '''
             return OMEXML.Pixels(self.node.find(qnome("Pixels")))
         
     def image(self, index=0):

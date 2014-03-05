@@ -357,16 +357,17 @@ __omero_password = None
 def set_omero_credentials(omero_server, omero_port, omero_username, omero_password):
     '''Set the credentials to be used to connect to the Omero server
     
-    omero_server - DNS name of the server
+    :param omero_server: DNS name of the server
 
-    omero_port - use this port to connect to the server
+    :param omero_port: use this port to connect to the server
 
-    omero_username - log on as this user
+    :param omero_username: log on as this user
 
-    omero_password - log on using this password
+    :param omero_password: log on using this password
     
-    The session ID is valid after this is called. An exception is thrown
-    if the login fails. omero_logout() can be called to log out.
+    The session ID is valid after this function is called. An exception is thrown
+    if the login fails. :func:`bioformats.omero_logout()` can be called to log out.
+
     '''
     global __omero_server
     global __omero_username
@@ -388,9 +389,10 @@ def set_omero_credentials(omero_server, omero_port, omero_username, omero_passwo
     return __omero_session_id
     
 def get_omero_credentials():
-    '''Return a pickleable dictionary representing the Omero credentials
+    '''Return a pickleable dictionary representing the Omero credentials.
     
-    Call use_omero_credentials in some other process to use this.
+    Call :func:`bioformats.use_omero_credentials` in some other process to use this.
+
     '''
     if __omero_session_id is None:
         omero_login()
@@ -427,14 +429,17 @@ def omero_login():
     return __omero_session_id
     
 def omero_logout():
-    '''Abandon any current Omero session'''
+    '''Abandon any current Omero session.
+
+    '''
     global __omero_session_id
     __omero_session_id = None
 
 def use_omero_credentials(credentials):
-    '''Use the session ID from an extant login as credentials
+    '''Use the session ID from an existing login as credentials.
     
-    credentials - credentials from get_omero_credentials
+    :param credentials: credentials from get_omero_credentials.
+
     '''
     global __omero_server
     global __omero_username
@@ -451,12 +456,16 @@ def use_omero_credentials(credentials):
     
 __omero_login_fn = None
 def set_omero_login_hook(fn):
-    '''Set the function to be called when a login to Omero is needed'''
+    '''Set the function to be called when a login to Omero is needed.
+
+    '''
     global __omero_login_fn
     __omero_login_fn = fn
     
 def get_omero_reader():
-    '''Return an loci.ome.io.OMEROReader instance, wrapped as a FormatReader'''
+    '''Return an ``loci.ome.io.OMEROReader`` instance, wrapped as a FormatReader.
+
+    '''
     script = """
     var rdr = new Packages.loci.ome.io.OmeroReader();
     rdr.setServer(server);
@@ -492,18 +501,19 @@ def load_using_bioformats_url(url, c=None, z=0, t=0, series=None, index=None,
     
 
 class ImageReader(object):
-    '''Find the appropriate reader for a file
+    '''Find the appropriate reader for a file.
     
     This class is meant to be harnessed to a scope like this:
     
-    with GetImageReader(path) as rdr:
-        ....
+    >>> with GetImageReader(path) as reader:
+    >>>     ....
         
-    It uses __enter__ and __exit__ to manage the random access stream
+    It uses `__enter__` and `__exit__` to manage the random access stream
     that can be used to cache the file contents in memory.
+
     '''
-    
-    def __init__(self, path = None, url= None, perform_init=True):
+
+    def __init__(self, path=None, url=None, perform_init=True):
         self.stream = None
         file_scheme = "file:"
         self.url = url
@@ -689,17 +699,17 @@ class ImageReader(object):
              rescale = True, wants_max_intensity = False, channel_names = None):
         '''Read a single plane from the image reader file.
         
-        c - read from this channel. None = read color image if multichannel
-            or interleaved RGB
-        z - z-stack index
-        t - time index
-        series - series for .flex and similar multi-stack formats
-        index - if None, fall back to zct, otherwise load the indexed frame
-        rescale - True to rescale the intensity scale to 0 and 1, False to
-                  return the raw values native to the file
-        wants_max_intensity - if False,  only return the image, if True
+        :param c: read from this channel. `None` = read color image if multichannel
+            or interleaved RGB.
+        :param z: z-stack index
+        :param t: time index
+        :param series: series for ``.flex`` and similar multi-stack formats
+        :param index: if `None`, fall back to ``zct``, otherwise load the indexed frame
+        :param rescale: `True` to rescale the intensity scale to 0 and 1; `False` to
+                  return the raw values native to the file.
+        :param wants_max_intensity: if `False`, only return the image; if `True`,
                   return a tuple of image and max intensity
-        channel_names - provide the channel names for the OME metadata
+        :param channel_names: provide the channel names for the OME metadata
         '''
         FormatTools = make_format_tools_class()
         ChannelSeparator = make_reader_wrapper_class(
@@ -888,14 +898,15 @@ def load_using_bioformats(path, c=None, z=0, t=0, series=None, index=None,
                           rescale = True,
                           wants_max_intensity = False,
                           channel_names = None):
-    '''Load the given image file using the Bioformats library
+    '''Load the given image file using the Bioformats library.
     
-    path: path to the file
-    z: the frame index in the z (depth) dimension.
-    t: the frame index in the time dimension.
-    channel_names: None if you don't want them, a list which will be filled if you do
+    :param path: path to the file
+    :param z: the frame index in the `z` (depth) dimension.
+    :param t: the frame index in the time dimension.
+    :param channel_names: `None` if you don't want them, a list which will be filled if you do.
     
-    Returns either a 2-d (grayscale) or 3-d (2-d + 3 RGB planes) image
+    :returns: either a 2-d (grayscale) or 3-d (2-d + 3 RGB planes) image.
+
     '''
     
     with ImageReader(path=path) as rdr:
@@ -905,13 +916,13 @@ def load_using_bioformats(path, c=None, z=0, t=0, series=None, index=None,
 def get_omexml_metadata(path=None, url=None):
     '''Read the OME metadata from a file using Bio-formats
     
-    path - path to the file
+    :param path: path to the file
     
-    allowopenfiles - allow the image reader to open files while looking for
-                     the proper reader class.
-                     
-    groupfiles - utilize the groupfiles option to take the directory structure
+    :param groupfiles: utilize the groupfiles option to take the directory structure
                  into account.
+
+    :returns: the metdata as XML.
+
     '''
     with ImageReader(path=path, url=url, perform_init=False) as rdr:
         #
