@@ -42,17 +42,42 @@ OMETiffWriter = _formatwriter.make_ome_tiff_writer_class()
 ChannelSeparator = _formatreader.make_reader_wrapper_class(
     "loci/formats/ChannelSeparator")
 
+
 from .metadatatools import createOMEXMLMetadata as create_ome_xml_metadata
 from .metadatatools import wrap_imetadata_object
 import metadatatools as _metadatatools
 PixelType = _metadatatools.make_pixel_type_class()
 get_metadata_options = _metadatatools.get_metadata_options
 
+# Reading images
+
+ImageReader = _formatreader.ImageReader
 load_image = _formatreader.load_using_bioformats
 load_image_url = _formatreader.load_using_bioformats_url
+
+# Cached image readers
+
 get_image_reader = _formatreader.get_image_reader
 release_image_reader = _formatreader.release_image_reader
+clear_image_reader_cache = _formatreader.clear_image_reader_cache
+
+# Metadata
+
+from .omexml import OMEXML
 get_omexml_metadata = _formatreader.get_omexml_metadata
+
+# Writing images
+
+write_image = _formatwriter.write_image
+
+from .omexml import PT_UINT16, PT_UINT8, PT_BIT
+
+# Omero
+
+from .formatreader import use_omero_credentials, set_omero_credentials, get_omero_credentials
+from .formatreader import set_omero_login_hook, omero_logout
+from .formatreader import K_OMERO_SERVER, K_OMERO_PORT, K_OMERO_USER, K_OMERO_SESSION_ID,\
+         K_OMERO_PASSWORD, K_OMERO_CONFIG_FILE
 
 from . import omexml
 

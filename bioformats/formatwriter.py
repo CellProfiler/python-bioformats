@@ -49,28 +49,29 @@ def write_image(pathname, pixels, pixel_type,
                 c = 0, z = 0, t = 0,
                 size_c = 1, size_z = 1, size_t = 1,
                 channel_names = None):
-    """Write the image using bioformats
+    """Write the image using bioformats.
     
-        filename - save to this filename
+    :param filename: save to this filename
         
-        pixels - the image to save
+    :param pixels: the image to save
         
-        pixel_type - save using this pixel type
+    :param pixel_type: save using this pixel type
         
-        c - the image's channel index
+    :param c: the image's channel index
         
-        z - the image's z index
+    :param z: the image's `z` index
         
-        t - the image's t index
+    :param t: the image's `t` index
         
-        sizeC - # of channels in the stack
+    :param sizeC: # of channels in the stack
         
-        sizeZ - # of z stacks
+    :param sizeZ: # of z stacks
         
-        sizeT - # of timepoints in the stack
+    :param sizeT: # of timepoints in the stack
         
-        channel_names - names of the channels (make up names if not present
-        """
+    :param channel_names: names of the channels (make up names if not present).
+
+    """
     omexml = ome.OMEXML()
     omexml.image(0).Name = os.path.split(pathname)[1]
     p = omexml.image(0).Pixels
