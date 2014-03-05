@@ -20,6 +20,7 @@ setup(
                  'Topic :: Scientific/Engineering :: Bio-Informatics',
                  'Topic :: Multimedia :: Graphics :: Graphics Conversion'
              ],
+    license='BSD License',
     package_data={'bioformats': ['jars/*.jar']},
 
     tests_require='nose',
