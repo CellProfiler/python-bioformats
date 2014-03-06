@@ -37,6 +37,21 @@ Running the unit tests requires Nose.
     python setup.py nosetests
 
 
+Starting the JVM
+================
+
+When starting the Java virtual machine with python-javabridge's
+:py:func:`javabridge.start_vm`, you must add the contents of
+:py:data:`bioformats.JARS` to the class path. Example:
+
+>>> import javabridge
+>>> import bioformats
+>>> javabridge.start_vm(class_path=bioformats.JARS)
+
+.. autodata:: bioformats.JARS
+   :annotation: list of strings
+
+
 Reading images
 ==============
 

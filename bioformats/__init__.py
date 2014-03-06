@@ -20,8 +20,11 @@ from . import formatreader as _formatreader
 from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
+
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
                           for name in ['loci_tools']]
+"""List of directories, jar files, and zip files that should be added
+to the Java virtual machine's class path."""
 
 # See http://www.loci.wisc.edu/software/bio-formats
 READABLE_FORMATS = ('al3d', 'am', 'amiramesh', 'apl', 'arf', 'avi', 'bmp', 
