@@ -36,7 +36,24 @@ Running the unit tests requires Nose.
 
     python setup.py nosetests
 
+Initialization and termination
+==============================
 
+The javabridge package must be used to start the JVM with loci_tools.jar
+which is the Bio-Formats library packaged with python-bioformats or with
+your own build of Bio-Formats. As a convenience, bioformats.JARS has a list
+of the required jar files.
+
+.. code::
+
+    import javabridge
+    import bioformats
+    javabridge.start_vm(class_path=bioformats.JARS)
+    
+    # your program goes here
+
+    javabridge.kill_vm()
+    
 Reading images
 ==============
 
