@@ -23,11 +23,6 @@ setup(
              ],
     license='BSD License',
     package_data={'bioformats': ['jars/*.jar']},
-    install_requires=['javabridge>=1.0'],
-    tests_require='nose',
-    entry_points={'nose.plugins.0.10': [
-            'javabridge = javabridge.noseplugin:JavabridgePlugin',
-            ]},
-    test_suite='nose.collector'
+    install_requires=['javabridge>=1.0']
 )
 

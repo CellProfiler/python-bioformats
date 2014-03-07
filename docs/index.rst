@@ -28,13 +28,7 @@ Running the unit tests
 
 Running the unit tests requires Nose.
 
-1. Build and install in the source code tree so that the unit tests can run::
-
-    python setup.py develop
-
-2. Running the unit tests::
-
-    python setup.py nosetests
+    python nosetests.py
 
 
 Starting the JVM
