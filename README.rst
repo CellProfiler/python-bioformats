@@ -18,6 +18,4 @@ Report bugs here: https://github.com/CellProfiler/python-bioformats/issues
 python-bioformats is licensed under the BSD license.  See the
 accompanying file LICENSE for details.
 
-Copyright (c) 2003-2009 Massachusetts Institute of Technology
-Copyright (c) 2009-2013 Broad Institute
-All rights reserved.
+Copyright (c) 2009-2014 Broad Institute. All rights reserved.

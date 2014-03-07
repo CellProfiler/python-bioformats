@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python-bioformats",
-    version="1.0.0pr2",
+    version="1.0.0pr3",
     description="Read and write life sciences file formats",
     long_description='''Python-bioformats is a Python wrapper for Bio-Formats, a standalone
     Java library for reading and writing life sciences image file
