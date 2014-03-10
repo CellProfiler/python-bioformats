@@ -1,3 +1,10 @@
+# Python-bioformats is distributed under the GNU General Public
+# License, but this file is licensed under the more permissive BSD
+# license.  See the accompanying file LICENSE for details.
+# 
+# Copyright (c) 2009-2014 Broad Institute
+# All rights reserved.
+
 '''formatreader.py - mechanism to wrap a bioformats ReaderWrapper and ImageReader
 
 Example:
@@ -13,17 +20,6 @@ Example:
     my_red_image, my_green_image, my_blue_image = \
         [cs.open_bytes(cs.getIndex(0,i,0)) for i in range(3)]
 
-CellProfiler is distributed under the GNU General Public License,
-but this file is licensed under the more permissive BSD license.
-See the accompanying file LICENSE for details.
-
-Copyright (c) 2003-2009 Massachusetts Institute of Technology
-Copyright (c) 2009-2014 Broad Institute
-All rights reserved.
-
-Please see the AUTHORS file for credits.
-
-Website: http://www.cellprofiler.org'
 '''
     
 __version__ = "$Revision$"

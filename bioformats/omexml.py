@@ -1,19 +1,14 @@
+# Python-bioformats is distributed under the GNU General Public
+# License, but this file is licensed under the more permissive BSD
+# license.  See the accompanying file LICENSE for details.
+# 
+# Copyright (c) 2009-2014 Broad Institute
+# All rights reserved.
+
 """omexml.py read and write OME xml
 
 """
-# CellProfiler is distributed under the GNU General Public License.
-# See the accompanying file LICENSE for details.
-# 
-# Developed by the Broad Institute
-#
-# Copyright (c) 2003-2009 Massachusetts Institute of Technology
-# Copyright (c) 2003-2013 Broad Institute
-# All rights reserved.
-# 
-# Please see the AUTHORS file for credits.
-# 
-# Website: http://www.cellprofiler.org
-#
+
 import xml.etree.ElementTree
 from xml.etree import cElementTree as ElementTree
 from cStringIO import StringIO

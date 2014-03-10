@@ -15,12 +15,12 @@ setup(
     url="http://github.com/CellProfiler/python-bioformats/",
     packages=['bioformats'],
     classifiers=['Development Status :: 5 - Production/Stable',
-                 'License :: OSI Approved :: BSD License',
+                 'License :: OSI Approved :: GPL License',
                  'Programming Language :: Java',
                  'Topic :: Scientific/Engineering :: Bio-Informatics',
                  'Topic :: Multimedia :: Graphics :: Graphics Conversion'
              ],
-    license='BSD License',
+    license='GPL License',
     package_data={'bioformats': ['jars/*.jar']},
     install_requires=['javabridge>=1.0']
 )

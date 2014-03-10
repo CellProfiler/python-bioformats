@@ -13,6 +13,9 @@ Python-bioformats and python-javabridge were developed for and are
 used by the cell image analysis software CellProfiler
 (cellprofiler.org).
 
+python-bioformats is licensed under the GNU General Public License
+(GPL).  Many files are licensed under the more permissive BSD license.
+
 
 Installation and testing
 ========================
