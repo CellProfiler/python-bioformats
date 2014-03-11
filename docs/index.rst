@@ -29,7 +29,11 @@ Install using pip
 Running the unit tests
 ----------------------
 
-Running the unit tests requires Nose.
+Running the unit tests requires Nose::
+
+    nosetests
+
+On some installations, the following also works::
 
     python nosetests.py
 
