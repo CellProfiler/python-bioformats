@@ -1,0 +1,3 @@
+recursive-include bioformats/tests *.py
+recursive-include bioformats/tests *.tif
+recursive-include bioformats/tests *.xml
