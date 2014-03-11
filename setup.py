@@ -55,7 +55,7 @@ setup(
     url="http://github.com/CellProfiler/python-bioformats/",
     packages=['bioformats'],
     classifiers=['Development Status :: 5 - Production/Stable',
-                 'License :: OSI Approved :: GPL License',
+                 'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
                  'Programming Language :: Java',
                  'Topic :: Scientific/Engineering :: Bio-Informatics',
                  'Topic :: Multimedia :: Graphics :: Graphics Conversion'
