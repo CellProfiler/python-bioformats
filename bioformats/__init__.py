@@ -1,18 +1,19 @@
+# Python-bioformats is distributed under the GNU General Public
+# License, but this file is licensed under the more permissive BSD
+# license.  See the accompanying file LICENSE for details.
+# 
+# Copyright (c) 2009-2014 Broad Institute
+# All rights reserved.
+
 '''Bioformats package - wrapper for loci.bioformats java code
 
-CellProfiler is distributed under the GNU General Public License,
-but this file is licensed under the more permissive BSD license.
-See the accompanying file LICENSE for details.
-
-Copyright (c) 2003-2009 Massachusetts Institute of Technology
-Copyright (c) 2009-2013 Broad Institute
-All rights reserved.
-
-Please see the AUTHORS file for credits.
-
-Website: http://www.cellprofiler.org
 '''
-__version__ = "$Revision$"
+
+try:
+    from _version import __version__
+except ImportError:
+    # We're running in a tree that doesn't have a _version.py, so we don't know what our version is.
+    __version__ = "0.0.0"
 
 import os.path
 import javabridge
@@ -20,8 +21,11 @@ from . import formatreader as _formatreader
 from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
+
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
                           for name in ['loci_tools']]
+"""List of directories, jar files, and zip files that should be added
+to the Java virtual machine's class path."""
 
 # See http://www.loci.wisc.edu/software/bio-formats
 READABLE_FORMATS = ('al3d', 'am', 'amiramesh', 'apl', 'arf', 'avi', 'bmp', 

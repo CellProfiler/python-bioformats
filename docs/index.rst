@@ -2,16 +2,19 @@
 python-bioformats: read and write life sciences image file formats
 ===================================================================
 
-The python-bioformats package is an interface to the `Bioformats
-<http://loci.wisc.edu/software/bio-formats>`_ library for reading and
-writing life sciences image file formats.
+The python-bioformats package is an interface to the `Bio-Formats
+<http://www.openmicroscopy.org/site/products/bio-formats>`_ library
+for reading and writing life sciences image file formats.
 
-Because Bioformats is a Java library, python-bioformats uses
+Because Bio-Formats is a Java library, python-bioformats uses
 python-javabridge to start and interact with a Java virtual machine.
 
 Python-bioformats and python-javabridge were developed for and are
 used by the cell image analysis software CellProfiler
 (cellprofiler.org).
+
+python-bioformats is licensed under the GNU General Public License
+(GPL).  Many files are licensed under the more permissive BSD license.
 
 
 Installation and testing
@@ -26,15 +29,28 @@ Install using pip
 Running the unit tests
 ----------------------
 
-Running the unit tests requires Nose.
+Running the unit tests requires Nose::
 
-1. Build and install in the source code tree so that the unit tests can run::
+    nosetests
 
-    python setup.py develop
+On some installations, the following also works::
 
-2. Running the unit tests::
+    python nosetests.py
 
-    python setup.py nosetests
+
+Starting the JVM
+================
+
+When starting the Java virtual machine with python-javabridge's
+:py:func:`javabridge.start_vm`, you must add the contents of
+:py:data:`bioformats.JARS` to the class path. Example:
+
+>>> import javabridge
+>>> import bioformats
+>>> javabridge.start_vm(class_path=bioformats.JARS)
+
+.. autodata:: bioformats.JARS
+   :annotation: list of strings
 
 Initialization and termination
 ==============================

@@ -15,9 +15,8 @@ GitHub repository: https://github.com/CellProfiler/python-bioformats
 
 Report bugs here: https://github.com/CellProfiler/python-bioformats/issues
 
-python-bioformats is licensed under the BSD license.  See the
-accompanying file LICENSE for details.
+python-bioformats is licensed under the GNU General Public License
+(GPL).  Many files are licensed under the more permissive BSD license.
+See the accompanying files COPYING and LICENSE for details.
 
-Copyright (c) 2003-2009 Massachusetts Institute of Technology
-Copyright (c) 2009-2013 Broad Institute
-All rights reserved.
+Copyright (c) 2009-2014 Broad Institute. All rights reserved.
