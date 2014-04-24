@@ -718,7 +718,7 @@ class ImageReader(object):
         pixel_type = self.rdr.getPixelType()
         little_endian = self.rdr.isLittleEndian()
         if pixel_type == FormatTools.INT8:
-            dtype = np.char
+            dtype = np.int8
             scale = 255
         elif pixel_type == FormatTools.UINT8:
             dtype = np.uint8
