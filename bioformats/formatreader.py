@@ -26,6 +26,8 @@ __version__ = "$Revision$"
 
 import logging
 logger = logging.getLogger(__name__)
+import errno
+import exceptions
 import numpy as np
 import os
 import sys
@@ -33,6 +35,7 @@ import urllib
 import urllib2
 import shutil
 import tempfile
+import traceback
 
 import javabridge as jutil
 import bioformats
@@ -340,6 +343,32 @@ def make_reader_wrapper_class(class_name):
                                   'Set the name of the data file')
     return ReaderWrapper
 
+__has_omero_jars = None
+def has_omero_packages():
+    '''Return True if we can find the packages needed for OMERO
+    
+    In order to run OMERO, you'll need the OMERO client and ICE
+    on your class path (not supplied with python-bioformats and
+    specific to your server's version)
+    '''
+    global __has_omero_jars
+    if __has_omero_jars is None:
+        class_loader = jutil.static_call(
+            "java/lang/ClassLoader", "getSystemClassLoader",
+            "()Ljava/lang/ClassLoader;")
+        for klass in ("Glacier2.PermissionDeniedException", 
+                      "loci.ome.io.OmeroReader", "omero.client"):
+            try:
+                jutil.call(
+                    class_loader, "loadClass", 
+                    "(Ljava/lang/String;)Ljava/lang/Class;", klass)
+            except:
+                __has_omero_jars = False
+                break
+        else:
+            __has_omero_jars = True
+    return __has_omero_jars
+
 __omero_server = None
 __omero_username = None
 __omero_session_id = None
@@ -542,9 +571,6 @@ class ImageReader(object):
                             omero_logout()
                             omero_login()
                         else:
-                            import errno
-                            import exceptions
-                            import traceback
                             logger.warn(e.message)
                             for line in traceback.format_exc().split("\n"):
                                 logger.warn(line)
@@ -581,6 +607,12 @@ class ImageReader(object):
                 self.path = self.path.replace("/", os.path.sep)
             filename = os.path.split(path)[1]
 
+        if not os.path.isfile(self.path):
+            raise exceptions.IOError(
+                errno.ENOENT, 
+                "The file, \"%s\", does not exist." % path,
+                path)
+            
         self.stream = jutil.make_instance('loci/common/RandomAccessInputStream',
                                           '(Ljava/lang/String;)V', 
                                           self.path)
@@ -664,14 +696,11 @@ class ImageReader(object):
         try:
             self.rdr.setId(self.path)
         except jutil.JavaException, e:
-            import errno
-            import exceptions
-            import traceback
             logger.warn(e.message)
             for line in traceback.format_exc().split("\n"):
                 logger.warn(line)
             je = e.throwable
-            if jutil.is_instance_of(
+            if has_omero_packages() and jutil.is_instance_of(
                 je, "Glacier2/PermissionDeniedException"):
                 # Handle at a higher level
                 raise

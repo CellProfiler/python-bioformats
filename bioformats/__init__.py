@@ -79,7 +79,7 @@ from .omexml import PT_UINT16, PT_UINT8, PT_BIT
 # Omero
 
 from .formatreader import use_omero_credentials, set_omero_credentials, get_omero_credentials
-from .formatreader import set_omero_login_hook, omero_logout
+from .formatreader import set_omero_login_hook, omero_logout, has_omero_packages
 from .formatreader import K_OMERO_SERVER, K_OMERO_PORT, K_OMERO_USER, K_OMERO_SESSION_ID,\
          K_OMERO_PASSWORD, K_OMERO_CONFIG_FILE
 

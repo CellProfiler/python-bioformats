@@ -121,6 +121,13 @@ Writing images
 OMERO
 =====
 
+Python-bioformats can load images from OMERO URLs. To do this, you'll need
+to put the JAR files for your OMERO server version onto your Java classpath
+when you start. For OMERO server 5.0.0, these are blitz.jar, common.jar,
+ice.jar, ice-glacier2.jar, ice-storm.jar and ice-grid.jar. You'll also need
+to use the matching version of the Bio-formats library for the OMERO release
+instead of the one included with python-bioformats.
+
 .. autofunction:: bioformats.use_omero_credentials
 .. autofunction:: bioformats.set_omero_credentials
 .. autofunction:: bioformats.get_omero_credentials

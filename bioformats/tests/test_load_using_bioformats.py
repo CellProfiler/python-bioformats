@@ -5,6 +5,7 @@
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
+import exceptions
 import os
 import unittest
 
@@ -30,4 +31,11 @@ class TestLoadUsingBioformats(unittest.TestCase):
         image, scale = load_image(path, rescale=False,
                                   wants_max_intensity=True)
         print image.shape
+        
+    def test_file_not_found(self):
+        # Regression test of issue #6
+        path = os.path.join(os.path.dirname(__file__), 'Channel5-01-A-01.tif')
+        self.assertRaises(exceptions.IOError, 
+                          lambda :load_image(path))
+
 
