@@ -775,7 +775,7 @@ class ImageReader(object):
             try:
                 scale = jutil.call(max_sample_value, 'intValue', '()I')
             except:
-                bioformats.logger.warning("WARNING: failed to get MaxSampleValue for image. Intensities may be improperly scaled.")
+                logger.warning("WARNING: failed to get MaxSampleValue for image. Intensities may be improperly scaled.")
         if index is not None:
             image = np.frombuffer(self.rdr.openBytes(index), dtype)
             if len(image) / height / width in (3,4):
