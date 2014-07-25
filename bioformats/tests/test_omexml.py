@@ -29,7 +29,7 @@ class TestOMEXML(unittest.TestCase):
         
     def test_00_00_init(self):
         o = O.OMEXML()
-        self.assertEquals(o.root_node.tag, O.qnome("OME"))
+        self.assertEquals(o.root_node.tag, O.qn(o.get_ns("ome"), "OME"))
         self.assertEquals(o.image_count, 1)
         
     def test_01_01_read(self):
@@ -40,20 +40,20 @@ class TestOMEXML(unittest.TestCase):
         o = O.OMEXML(TIFF_XML)
         for node, expected_tag in zip(
             o.root_node, 
-            (O.qnome("Image"), O.qn(O.NS_SA, "StructuredAnnotations"))):
+            (O.qn(o.get_ns("ome"), "Image"), O.qn(o.get_ns("sa"), "StructuredAnnotations"))):
             self.assertEqual(node.tag, expected_tag)
             
     def test_02_02_get_text(self):
         o = O.OMEXML(TIFF_XML)
         ad = o.root_node.find(
-            "/".join([O.qnome(x) for x in ("Image", "AcquiredDate")]))
+            "/".join([O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquiredDate")]))
         self.assertEqual(O.get_text(ad), "2008-02-05T17:24:46")
         
     def test_02_04_set_text(self):
         o = O.OMEXML(TIFF_XML)
         ad = o.root_node.find("/".join(
-            [O.qnome(x) for x in ("Image", "AcquiredDate")]))
-        im = o.root_node.find(O.qnome("Image"))
+            [O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquiredDate")]))
+        im = o.root_node.find(O.qn(o.get_ns("ome"), "Image"))
         O.set_text(im, "Foo")
         self.assertEqual(O.get_text(im), "Foo")
         O.set_text(ad, "Bar")
@@ -67,7 +67,7 @@ class TestOMEXML(unittest.TestCase):
     def test_03_02_set_image_count(self):
         o = O.OMEXML(TIFF_XML)
         o.image_count = 2
-        self.assertEqual(len(o.root_node.findall(O.qnome("Image"))), 2)
+        self.assertEqual(len(o.root_node.findall(O.qn(o.get_ns("ome"), "Image"))), 2)
         
     def test_03_03_image(self):
         o = O.OMEXML(self.GROUPFILES_XML)
@@ -79,7 +79,7 @@ class TestOMEXML(unittest.TestCase):
     def test_03_04_structured_annotations(self):
         o = O.OMEXML(TIFF_XML)
         self.assertEqual(o.structured_annotations.node.tag, 
-                         O.qn(O.NS_SA, "StructuredAnnotations"))
+                         O.qn(o.get_ns("sa"), "StructuredAnnotations"))
         
     def test_04_01_image_get_id(self):
         o =  O.OMEXML(TIFF_XML)
@@ -188,7 +188,7 @@ class TestOMEXML(unittest.TestCase):
         o = O.OMEXML(TIFF_XML)
         o.image(0).Pixels.channel_count = 2
         self.assertEqual(
-            len(o.image(0).Pixels.node.findall(O.qnome("Channel"))), 2)
+            len(o.image(0).Pixels.node.findall(O.qn(o.get_ns("ome"), "Channel"))), 2)
         
     def test_06_01_channel_get_id(self):
         o = O.OMEXML(TIFF_XML)
@@ -220,8 +220,8 @@ class TestOMEXML(unittest.TestCase):
     def test_07_01_sa_get_item(self):
         o = O.OMEXML(TIFF_XML)
         a = o.structured_annotations["Annotation:4"]
-        self.assertEqual(a.tag, O.qn(O.NS_SA, "XMLAnnotation"))
-        values = a.findall(O.qn(O.NS_SA, "Value"))
+        self.assertEqual(a.tag, O.qn(o.get_ns("sa"), "XMLAnnotation"))
+        values = a.findall(O.qn(o.get_ns("sa"), "Value"))
         self.assertEqual(len(values), 1)
         oms = values[0].findall(O.qn(O.NS_ORIGINAL_METADATA, "OriginalMetadata"))
         self.assertEqual(len(oms), 1)
@@ -265,9 +265,9 @@ class TestOMEXML(unittest.TestCase):
         o = O.OMEXML()
         o.structured_annotations.OriginalMetadata["Foo"] = "Bar"
         sa = o.structured_annotations.node
-        a = sa.findall(O.qn(O.NS_SA, "XMLAnnotation"))
+        a = sa.findall(O.qn(o.get_ns("sa"), "XMLAnnotation"))
         self.assertEqual(len(a), 1)
-        vs = a[0].findall(O.qn(O.NS_SA, "Value"))
+        vs = a[0].findall(O.qn(o.get_ns("sa"), "Value"))
         self.assertEqual(len(vs), 1)
         om = vs[0].findall(O.qn(O.NS_ORIGINAL_METADATA, "OriginalMetadata"))
         self.assertEqual(len(om), 1)
@@ -525,7 +525,7 @@ class TestOMEXML(unittest.TestCase):
         w = plate.Well.new(4,5, "xyz")
         w.Sample.new("ooo")
         w.Sample.new("ppp")
-        sample_nodes = w.node.findall(O.qn(O.NS_SPW, "WellSample"))
+        sample_nodes = w.node.findall(O.qn(o.get_ns("spw"), "WellSample"))
         self.assertEqual(len(sample_nodes), 2)
         self.assertEqual(sample_nodes[0].get("ID"), "ooo")
         self.assertEqual(sample_nodes[1].get("ID"), "ppp")
@@ -592,7 +592,7 @@ class TestOMEXML(unittest.TestCase):
         o = O.OMEXML(self.GROUPFILES_XML)
         ws = o.plates[0].Well['A02'].Sample[3]
         self.assertEqual(ws.ImageRef, "Image:9")
-        ref = ws.node.find(O.qn(O.NS_SPW, "ImageRef"))
+        ref = ws.node.find(O.qn(o.get_ns("spw"), "ImageRef"))
         ws.node.remove(ref)
         self.assertTrue(ws.ImageRef is None)
         
@@ -600,7 +600,7 @@ class TestOMEXML(unittest.TestCase):
         o = O.OMEXML(self.GROUPFILES_XML)
         ws = o.plates[0].Well['A02'].Sample[3]
         ws.ImageRef = "Foo"
-        self.assertEqual(ws.node.find(O.qn(O.NS_SPW, "ImageRef")).get("ID"), "Foo")
+        self.assertEqual(ws.node.find(O.qn(o.get_ns("spw"), "ImageRef")).get("ID"), "Foo")
         
     def test_14_01_get_plane_count(self):
         o = O.OMEXML(TIFF_XML)
@@ -611,7 +611,7 @@ class TestOMEXML(unittest.TestCase):
         pixels = o.image(0).Pixels
         self.assertTrue(isinstance(pixels, O.OMEXML.Pixels))
         pixels.plane_count = 2
-        self.assertEqual(len(pixels.node.findall(O.qnome( "Plane"))), 2)
+        self.assertEqual(len(pixels.node.findall(O.qn(o.get_ns('ome'), "Plane"))), 2)
         
     def test_14_03_get_the_c(self):
         o = O.OMEXML(TIFF_XML)
