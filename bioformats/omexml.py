@@ -26,14 +26,13 @@ DEFAULT_NOW = xsd_now()
 #
 # The namespaces
 #
-NS_OME = "http://www.openmicroscopy.org/Schemas/OME/2013-06"
 NS_BINARY_FILE = "http://www.openmicroscopy.org/Schemas/BinaryFile/2013-06"
-NS_SA = "http://www.openmicroscopy.org/Schemas/SA/2013-06"
 NS_ORIGINAL_METADATA = "openmicroscopy.org/OriginalMetadata"
-NS_SPW = "http://www.openmicroscopy.org/Schemas/SPW/2013-06"
+NS_DEFAULT = "http://www.openmicroscopy.org/Schemas/{ns_key}/2013-06"
+NS_RE = r"http://www.openmicroscopy.org/Schemas/(?P<ns_key>.*)/[0-9/-]"
 
 default_xml = """<?xml version="1.0" encoding="UTF-8"?>
-<OME xmlns="%(NS_OME)s" 
+<OME xmlns="{ns_ome_default}s" 
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
      xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2013-06 http://www.openmicroscopy.org/Schemas/OME/2012-03/ome.xsd">
   <Image ID="Image:0" Name="default.png">
@@ -53,9 +52,9 @@ default_xml = """<?xml version="1.0" encoding="UTF-8"?>
        BigEndian="false" Length="0"/>
     </Pixels>
   </Image>
-  <StructuredAnnotations xmlns="%(NS_SA)s"/>
-</OME>
-""" % globals()
+  <StructuredAnnotations xmlns="{ns_sa_default}s"/>
+</OME>""".format(ns_ome_default=NS_DEFAULT.format(ns_key='ome'), ns_sa_default=NS_DEFAULT.format(ns_key='sa'))
+
 #
 # These are the OME-XML pixel types - not all supported by subimager
 #
@@ -219,9 +218,21 @@ def qn(namespace, tag_name):
     '''
     return "{%s}%s" % (namespace, tag_name)
 
-def qnome(tag_name):
-    '''Return the qualified tag name in the OME namespace'''
-    return qn(NS_OME, tag_name)
+def split_qn(qn):
+    '''Split a qualified tag name or return None if namespace not present'''
+    m = re.match('\{(.*)\}(.*)', qn)
+    return m.group(1), m.group(2) if m else None
+
+def get_namespaces(node):
+    '''Get top-level XML namespaces from a node.'''
+    ns_lib = {'ome': None, 'sa': None, 'spw': None}
+    for child in node.iter():
+        ns = split_qn(child.tag)[0]
+        match = re.match(NS_RE, ns)
+        if match:
+            ns_key = match.group('ns_key').lower()
+            ns_lib[ns_key] = ns
+    return ns_lib
 
 def get_float_attr(node, attribute):
     '''Cast an element attribute to a float or return None if not present'''
@@ -296,15 +307,20 @@ class OMEXML(object):
         if isinstance(xml, unicode):
             xml = xml.encode("utf-8")
         self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
-        
+
+        # determine OME namespaces
+        self.ns = get_namespaces(self.dom.getroot())
+        if self.ns['ome'] is None:
+            raise Exception("Error: String not in OME-XML format")
+
     def __str__(self):
         #
         # need to register the ome namespace because BioFormats expects
         # that namespace to be the default or to be explicitly named "ome"
         #
-        ElementTree.register_namespace("ome", NS_OME)
-        ElementTree.register_namespace("sa", NS_SA)
-        ElementTree.register_namespace("spw", NS_SPW)
+        for ns_key in ["ome", "sa", "spw"]:
+            ns = self.ns.get(ns_key) or NS_DEFAULT.format(ns_key=ns_key)
+            ElementTree.register_namespace(ns_key, ns)
         ElementTree.register_namespace("om", NS_ORIGINAL_METADATA)
         result = StringIO()
         ElementTree.ElementTree(self.root_node).write(result, 
@@ -315,29 +331,32 @@ class OMEXML(object):
     def to_xml(self, indent="\t", newline="\n", encoding = "utf-8"):
         return str(self)
 
+    def get_ns(self, key):
+        return self.ns[key]
+
     @property
     def root_node(self):
         return self.dom.getroot()
     
     def get_image_count(self):
         '''The number of images (= series) specified by the XML'''
-        return len(self.root_node.findall(qnome("Image")))
+        return len(self.root_node.findall(qn(self.ns['ome'], "Image")))
     
     def set_image_count(self, value):
         '''Add or remove image nodes as needed'''
         assert value > 0
         root = self.root_node
         if self.image_count > value:
-            image_nodes = root.find(qnome("Image"))
+            image_nodes = root.find(qn(self.ns['ome'], "Image"))
             for image_node in image_nodes[value:]:
                 root.remove(image_node)
         while(self.image_count < value):
-            new_image = self.Image(ElementTree.SubElement(root, qnome("Image")))
+            new_image = self.Image(ElementTree.SubElement(root, qn(self.ns['ome'], "Image")))
             new_image.ID = str(uuid.uuid4())
             new_image.Name = "default.png"
             new_image.AcquiredDate = xsd_now()
             new_pixels = self.Pixels(
-                ElementTree.SubElement(new_image.node, qnome("Pixels")))
+                ElementTree.SubElement(new_image.node, qn(self.ns['ome'], "Pixels")))
             new_pixels.ID = str(uuid.uuid4())
             new_pixels.DimensionOrder = DO_XYCTZ
             new_pixels.PixelType = PT_UINT8
@@ -347,7 +366,7 @@ class OMEXML(object):
             new_pixels.SizeY = 512
             new_pixels.SizeZ = 1
             new_channel = self.Channel(
-                ElementTree.SubElement(new_pixels.node, qnome("Channel")))
+                ElementTree.SubElement(new_pixels.node, qn(self.ns['ome'], "Channel")))
             new_channel.ID = "Channel%d:0" % self.image_count
             new_channel.Name = new_channel.ID
             new_channel.SamplesPerPixel = 1
@@ -365,10 +384,10 @@ class OMEXML(object):
         returns a wrapping of OME/StructuredAnnotations. It creates
         the element if it doesn't exist.
         '''
-        node = self.root_node.find(qn(NS_SA, "StructuredAnnotations"))
+        node = self.root_node.find(qn(self.ns['sa'], "StructuredAnnotations"))
         if node is None:
             node = ElementTree.SubElement(
-                self.root_node, qn(NS_SA, "StructuredAnnotations"))
+                self.root_node, qn(self.ns['sa'], "StructuredAnnotations"))
         return self.StructuredAnnotations(node)
     
     class Image(object):
@@ -376,7 +395,8 @@ class OMEXML(object):
         def __init__(self, node):
             '''Initialize with the DOM Image node'''
             self.node = node
-            
+            self.ns = get_namespaces(self.node)
+
         def get_ID(self):
             return self.node.get("ID")
         
@@ -393,16 +413,16 @@ class OMEXML(object):
         
         def get_AcquiredDate(self):
             '''The date in ISO-8601 format'''
-            acquired_date = self.node.find(qnome("AcquiredDate"))
+            acquired_date = self.node.find(qn(self.ns["ome"], "AcquiredDate"))
             if acquired_date is None:
                 return None
             return get_text(acquired_date)
         
         def set_AcquiredDate(self, date):
-            acquired_date = self.node.find(qnome("AcquiredDate"))
+            acquired_date = self.node.find(qn(self.ns["ome"], "AcquiredDate"))
             if acquired_date is None:
                 acquired_date = ElementTree.SubElement(
-                    self.node, qnome("AcquiredDate"))
+                    self.node, qn(self.ns, "AcquiredDate"))
             set_text(acquired_date, date)
         AcquiredDate = property(get_AcquiredDate, set_AcquiredDate)
             
@@ -418,17 +438,18 @@ class OMEXML(object):
             >>> timepoint_count = pixels.SizeT
 
             '''
-            return OMEXML.Pixels(self.node.find(qnome("Pixels")))
+            return OMEXML.Pixels(self.node.find(qn(self.ns['ome'], "Pixels")))
         
     def image(self, index=0):
         '''Return an image node by index'''
-        return self.Image(self.root_node.findall(qnome("Image"))[index])
+        return self.Image(self.root_node.findall(qn(self.ns['ome'], "Image"))[index])
     
     class Channel(object):
         '''The OME/Image/Pixels/Channel element'''
         def __init__(self, node):
             self.node = node
-            
+            self.ns = get_namespaces(node)
+ 
         def get_ID(self):
             return self.node.get("ID")
         def set_ID(self, value):
@@ -457,7 +478,8 @@ class OMEXML(object):
         '''
         def __init__(self, node):
             self.node = node
-            
+            self.ns = get_namespaces(self.node)
+
         def get_TheZ(self):
             '''The Z index of the plane'''
             return get_int_attr(self.node, "TheZ")
@@ -542,6 +564,7 @@ class OMEXML(object):
         '''
         def __init__(self, node):
             self.node = node
+            self.ns = get_namespaces(self.node)
             
         def get_ID(self):
             return self.node.get("ID")
@@ -620,19 +643,19 @@ class OMEXML(object):
             pixels.Channel(0).Name = "Red"
             ...
             '''
-            return len(self.node.findall(qnome("Channel")))
+            return len(self.node.findall(qn(self.ns['ome'], "Channel")))
         
         def set_channel_count(self, value):
             assert value > 0
             channel_count = self.channel_count
             if channel_count > value:
-                channels = self.node.findall(qnome(NS_OME, "Channel"))
+                channels = self.node.findall(qn(self.ns['ome'], "Channel"))
                 for channel in channels[value:]:
                     self.node.remove(channel)
             else:
                 for _ in range(channel_count, value):
                     new_channel = OMEXML.Channel(
-                        ElementTree.SubElement(self.node, qnome("Channel")))
+                        ElementTree.SubElement(self.node, qn(self.ns['ome'], "Channel")))
                     new_channel.ID = str(uuid.uuid4())
                     new_channel.Name = new_channel.ID
                     new_channel.SamplesPerPixel = 1
@@ -641,7 +664,7 @@ class OMEXML(object):
         
         def Channel(self, index=0):
             '''Get the indexed channel from the Pixels element'''
-            channel = self.node.findall(qnome("Channel"))[index]
+            channel = self.node.findall(qn(self.ns['ome'], "Channel"))[index]
             return OMEXML.Channel(channel)
     
         def get_plane_count(self):
@@ -657,25 +680,25 @@ class OMEXML(object):
             pixels.Plane(0).TheZ=pixels.Plane(0).TheC=pixels.Plane(0).TheT=0
             ...
             '''
-            return len(self.node.findall(qnome("Plane")))
+            return len(self.node.findall(qn(self.ns['ome'], "Plane")))
         
         def set_plane_count(self, value):
             assert value >= 0
             plane_count = self.plane_count
             if plane_count > value:
-                planes = self.node.findall(qnome("Plane"))
+                planes = self.node.findall(qn(self.ns['ome'], "Plane"))
                 for plane in planes[value:]:
                     self.node.remove(plane)
             else:
                 for _ in range(plane_count, value):
                     new_plane = OMEXML.Plane(
-                        ElementTree.SubElement(self.node, qnome("Plane")))
+                        ElementTree.SubElement(self.node, qn(self.ns['ome'], "Plane")))
                 
         plane_count = property(get_plane_count, set_plane_count)
         
         def Plane(self, index=0):
             '''Get the indexed plane from the Pixels element'''
-            plane = self.node.findall(qnome("Plane"))[index]
+            plane = self.node.findall(qn(self.ns['ome'], "Plane"))[index]
             return OMEXML.Plane(plane)
         
     class StructuredAnnotations(dict):
@@ -700,7 +723,8 @@ class OMEXML(object):
         
         def __init__(self, node):
             self.node = node
-            
+            self.ns = get_namespaces(self.node)
+       
         def __getitem__(self, key):
             for child in self.node:
                 if child.get("ID") == key:
@@ -727,10 +751,10 @@ class OMEXML(object):
             returns the ID for the structured annotation.
             '''
             xml_annotation = ElementTree.SubElement(
-                self.node, qn(NS_SA, "XMLAnnotation"))
+                self.node, qn(self.ns['sa'], "XMLAnnotation"))
             node_id = str(uuid.uuid4())
             xml_annotation.set("ID", node_id)
-            xa_value = ElementTree.SubElement(xml_annotation, qn(NS_SA, "Value"))
+            xa_value = ElementTree.SubElement(xml_annotation, qn(self.ns['sa'], "Value"))
             ov = ElementTree.SubElement(
                 xa_value, qn(NS_ORIGINAL_METADATA, "OriginalMetadata"))
             ov_key = ElementTree.SubElement(ov, qn(NS_ORIGINAL_METADATA, "Key"))
@@ -766,10 +790,10 @@ class OMEXML(object):
             #    </XMLAnnotation>
             # </StructuredAnnotations>
             #
-            for annotation_node in self.node.findall(qn(NS_SA, "XMLAnnotation")):
+            for annotation_node in self.node.findall(qn(self.ns['sa'], "XMLAnnotation")):
                 # <XMLAnnotation/>
                 annotation_id = annotation_node.get("ID")
-                for xa_value_node in annotation_node.findall(qn(NS_SA, "Value")):
+                for xa_value_node in annotation_node.findall(qn(self.ns['sa'], "Value")):
                     # <Value/>
                     for om_node in xa_value_node.findall(
                         qn(NS_ORIGINAL_METADATA, "OriginalMetadata")):
@@ -861,23 +885,24 @@ class OMEXML(object):
         '''It looks like a list of plates'''
         def __init__(self, root):
             self.root = root
-            
+            self.ns = get_namespaces(self.root)
+
         def __getitem__(self, key):
-            plates = self.root.findall(qn(NS_SPW, "Plate"))
+            plates = self.root.findall(qn(self.ns['spw'], "Plate"))
             if isinstance(key, slice):
                 return [OMEXML.Plate(plate) for plate in plates[key]]
             return OMEXML.Plate(plates[key])
         
         def __len__(self):
-            return len(self.root.findall(qn(NS_SPW, "Plate")))
+            return len(self.root.findall(qn(self.ns['spw'], "Plate")))
         
         def __iter__(self):
-            for plate in self.root.iterfind(qn(NS_SPW, "Plate")):
+            for plate in self.root.iterfind(qn(self.ns['spw'], "Plate")):
                 yield OMEXML.Plate(plate)
                 
         def newPlate(self, name, plate_id = str(uuid.uuid4())):
             new_plate_node = ElementTree.SubElement(
-                self.root, qn(NS_SPW, "Plate"))
+                self.root, qn(self.ns['spw'], "Plate"))
             new_plate = OMEXML.Plate(new_plate_node)
             new_plate.ID = plate_id
             new_plate.Name = name
@@ -891,6 +916,7 @@ class OMEXML(object):
         '''
         def __init__(self, node):
             self.node = node
+            self.ns = get_namespaces(self.node)
             
         def get_ID(self):
             return self.node.get("ID")
@@ -975,7 +1001,7 @@ class OMEXML(object):
         Columns = property(get_Columns, set_Columns)
         
         def get_Description(self):
-            description = self.node.find(qn(NS_SPW, "Description"))
+            description = self.node.find(qn(self.ns['spw'], "Description"))
             if description is None:
                 return None
             return get_text(description)
@@ -1017,12 +1043,13 @@ class OMEXML(object):
         def __init__(self, plate):
             self.plate_node = plate.node
             self.plate = plate
+            self.ns = get_namespaces(self.plate_node)
             
         def __len__(self):
-            return len(self.plate_node.findall(qn(NS_SPW, "Well")))
+            return len(self.plate_node.findall(qn(self.ns['spw'], "Well")))
         
         def __getitem__(self, key):
-            all_wells = self.plate_node.findall(qn(NS_SPW, "Well"))
+            all_wells = self.plate_node.findall(qn(self.ns['spw'], "Well"))
             if isinstance(key, slice):
                 return [OMEXML.Well(w) for w in all_wells[key]]
             if hasattr(key, "__len__") and len(key) == 2:
@@ -1048,7 +1075,7 @@ class OMEXML(object):
             for instance, 'B03' for a well with Row=1, Column=2 for a plate
             with the standard row and column naming convention
             '''
-            all_wells = self.plate_node.findall(qn(NS_SPW, "Well"))
+            all_wells = self.plate_node.findall(qn(self.ns['spw'], "Well"))
             well = OMEXML.Well(None)
             for w in all_wells:
                 well.node = w
@@ -1062,7 +1089,7 @@ class OMEXML(object):
             well_id - the ID attribute for the well
             '''
             well_node = ElementTree.SubElement(
-                self.plate_node, qn(NS_SPW, "Well"))
+                self.plate_node, qn(self.ns['spw'], "Well"))
             well = OMEXML.Well(well_node)
             well.Row = row
             well.Column = column
@@ -1126,12 +1153,13 @@ class OMEXML(object):
         '''
         def __init__(self, well_node):
             self.well_node = well_node
+            self.ns = get_namespaces(self.well_node)
             
         def __len__(self):
-            return len(self.well_node.findall(qn(NS_SPW, "WellSample")))
+            return len(self.well_node.findall(qn(self.ns['spw'], "WellSample")))
         
         def __getitem__(self, key):
-            all_samples = self.well_node.findall(qn(NS_SPW, "WellSample"))
+            all_samples = self.well_node.findall(qn(self.ns['spw'], "WellSample"))
             if isinstance(key, slice):
                 return [OMEXML.WellSample(s) 
                         for s in all_samples[key]]
@@ -1139,7 +1167,7 @@ class OMEXML(object):
         
         def __iter__(self):
             '''Iterate through the well samples.'''
-            all_samples = self.well_node.findall(qn(NS_SPW, "WellSample"))
+            all_samples = self.well_node.findall(qn(self.ns['spw'], "WellSample"))
             for s in all_samples:
                 yield OMEXML.WellSample(s)
                 
@@ -1149,7 +1177,7 @@ class OMEXML(object):
             if index is None:
                 index = reduce(max, [s.Index for s in self], -1) + 1
             new_node = ElementTree.SubElement(
-                self.well_node, qn(NS_SPW, "WellSample"))
+                self.well_node, qn(self.ns['spw'], "WellSample"))
             s = OMEXML.WellSample(new_node)
             s.ID = wellsample_id
             s.Index = index
@@ -1158,6 +1186,7 @@ class OMEXML(object):
         '''The WellSample is a location within a well'''
         def __init__(self, node):
             self.node = node
+            self.ns = get_namespaces(self.node)
             
         def get_ID(self):
             return self.node.get("ID")
@@ -1197,16 +1226,16 @@ class OMEXML(object):
         
         def get_ImageRef(self):
             '''Get the ID of the image of this site'''
-            ref = self.node.find(qn(NS_SPW, "ImageRef"))
+            ref = self.node.find(qn(self.ns['spw'], "ImageRef"))
             if ref is None:
                 return None
             return ref.get("ID")
         
         def set_ImageRef(self, value):
             '''Add a reference to the image of this site'''
-            ref = self.node.find(qn(NS_SPW, "ImageRef"))
+            ref = self.node.find(qn(self.ns['spw'], "ImageRef"))
             if ref is None:
-                ref = ElementTree.SubElement(self.node, qn(NS_SPW, "ImageRef"))
+                ref = ElementTree.SubElement(self.node, qn(self.ns['spw'], "ImageRef"))
             ref.set("ID", value)
         ImageRef = property(get_ImageRef, set_ImageRef)
         
