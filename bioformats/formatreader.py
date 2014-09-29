@@ -793,7 +793,9 @@ class ImageReader(object):
         elif self.rdr.isRGB() and self.rdr.isInterleaved():
             index = self.rdr.getIndex(z,0,t)
             image = np.frombuffer(self.rdr.openBytes(index), dtype)
-            image.shape = (height, width, 3)
+            image.shape = (height, width, getSizeC())
+            if image.shape[2] > 3:
+                image = image[:, :, :3]
         elif c is not None and self.rdr.getRGBChannelCount() == 1:
             index = self.rdr.getIndex(z,c,t)
             image = np.frombuffer(self.rdr.openBytes(index), dtype)
