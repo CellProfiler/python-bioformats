@@ -98,9 +98,10 @@ def make_iformat_reader_class():
         getDimensionOrder = jutil.make_method('getDimensionOrder',
                                               '()Ljava/lang/String;',
                                               'Return the dimension order as a five-character string, e.g. "XYCZT"')
-        getMetadata = jutil.make_method('getMetadata',
+        getGlobalMetadata = jutil.make_method('getGlobalMetadata',
                                         '()Ljava/util/Hashtable;',
-                                        'Obtains the hashtable containing the metadata field/value pairs')
+                                        'Obtains the hashtable containing the global metadata field/value pairs')
+        getMetadata = getGlobalMetadata
         getMetadataValue = jutil.make_method('getMetadataValue',
                                              '(Ljava/lang/String;)'
                                              'Ljava/lang/Object;',
