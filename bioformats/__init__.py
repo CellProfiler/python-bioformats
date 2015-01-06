@@ -22,6 +22,8 @@ from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
 
+JAR_VERSION = '5.0.6'
+
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
                           for name in ['loci_tools']]
 """List of directories, jar files, and zip files that should be added
