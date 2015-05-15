@@ -840,16 +840,21 @@ class ImageReader(object):
             image = np.frombuffer(self.rdr.openBytes(index),dtype)
             if pixel_type in (FormatTools.INT16, FormatTools.UINT16):
                 lut = self.rdr.get16BitLookupTable()
-                lut = np.array(
-                    [env.get_short_array_elements(d)
-                     for d in env.get_object_array_elements(lut)]).transpose()
+                if lut is not None:
+                    lut = np.array(
+                        [env.get_short_array_elements(d)
+                         for d in env.get_object_array_elements(lut)])\
+                        .transpose()
             else:
                 lut = self.rdr.get8BitLookupTable()
-                lut = np.array(
-                    [env.get_byte_array_elements(d)
-                     for d in env.get_object_array_elements(lut)]).transpose()
+                if lut is not None:
+                    lut = np.array(
+                        [env.get_byte_array_elements(d)
+                         for d in env.get_object_array_elements(lut)])\
+                        .transpose()
             image.shape = (height, width)
-            if not np.all(lut == np.arange(lut.shape[0])[:, np.newaxis]):
+            if (lut is not None) \
+               and not np.all(lut == np.arange(lut.shape[0])[:, np.newaxis]):
                 image = lut[image, :]
         else:
             index = self.rdr.getIndex(z,0,t)
