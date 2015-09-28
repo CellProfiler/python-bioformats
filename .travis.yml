@@ -40,8 +40,8 @@ install:
 script:
    # Run tests.
    - python nosetests.py
-#after_success:
+after_success:
    # Submit results to coveralls.io.
-   #- coveralls
+   - coveralls
 # Use container format for TravisCI for quicker startup and builds.
 sudo: false
