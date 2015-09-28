@@ -40,6 +40,10 @@ install:
 script:
    # Run tests.
    - python nosetests.py
+   # Build docs.
+   - cd docs
+   - make html
+   - cd ..
 #after_success:
    # Submit results to coveralls.io.
    #- coveralls
