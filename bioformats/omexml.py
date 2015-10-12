@@ -36,7 +36,7 @@ default_xml = """<?xml version="1.0" encoding="UTF-8"?>
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
      xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2013-06 http://www.openmicroscopy.org/Schemas/OME/2012-03/ome.xsd">
   <Image ID="Image:0" Name="default.png">
-    <AcquiredDate>%(DEFAULT_NOW)s</AcquiredDate>
+    <AcquisitionDate>%(DEFAULT_NOW)s</AcquisitionDate>
     <Pixels DimensionOrder="XYCTZ" 
             ID="Pixels:0" 
             SizeC="1" 
@@ -278,7 +278,7 @@ class OMEXML(object):
     derived objects. For instance:
     
     >>> o = OMEXML()
-    >>> print o.image().AcquiredDate
+    >>> print o.image().AcquisitionDate
     
     will get you the date that image # 0 was acquired.
     
@@ -354,7 +354,7 @@ class OMEXML(object):
             new_image = self.Image(ElementTree.SubElement(root, qn(self.ns['ome'], "Image")))
             new_image.ID = str(uuid.uuid4())
             new_image.Name = "default.png"
-            new_image.AcquiredDate = xsd_now()
+            new_image.AcquisitionDate = xsd_now()
             new_pixels = self.Pixels(
                 ElementTree.SubElement(new_image.node, qn(self.ns['ome'], "Pixels")))
             new_pixels.ID = str(uuid.uuid4())
@@ -411,20 +411,21 @@ class OMEXML(object):
             self.node.set("Name", value)
         Name = property(get_Name, set_Name)
         
-        def get_AcquiredDate(self):
+        def get_AcquisitionDate(self):
             '''The date in ISO-8601 format'''
-            acquired_date = self.node.find(qn(self.ns["ome"], "AcquiredDate"))
+            acquired_date = self.node.find(qn(self.ns["ome"], "AcquisitionDate"))
             if acquired_date is None:
                 return None
             return get_text(acquired_date)
         
-        def set_AcquiredDate(self, date):
-            acquired_date = self.node.find(qn(self.ns["ome"], "AcquiredDate"))
+        def set_AcquisitionDate(self, date):
+            acquired_date = self.node.find(qn(self.ns["ome"], "AcquisitionDate"))
             if acquired_date is None:
                 acquired_date = ElementTree.SubElement(
-                    self.node, qn(self.ns, "AcquiredDate"))
+                    self.node, qn(self.ns["ome"], "AcquisitionDate"))
             set_text(acquired_date, date)
-        AcquiredDate = property(get_AcquiredDate, set_AcquiredDate)
+        AcquisitionDate = property(get_AcquisitionDate, set_AcquisitionDate)
+
             
         @property
         def Pixels(self):
