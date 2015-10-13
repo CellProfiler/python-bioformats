@@ -59,11 +59,11 @@ def write_image(pathname, pixels, pixel_type,
         
     :param t: the image's `t` index
         
-    :param sizeC: # of channels in the stack
+    :param size_c: # of channels in the stack
         
-    :param sizeZ: # of z stacks
+    :param size_z: # of z stacks
         
-    :param sizeT: # of timepoints in the stack
+    :param size_t: # of timepoints in the stack
         
     :param channel_names: names of the channels (make up names if not present).
 

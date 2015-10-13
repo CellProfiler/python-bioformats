@@ -23,8 +23,9 @@ Installation and testing
 Install using pip
 -----------------
 
-    pip install python-bioformats
+::
 
+    pip install python-bioformats
 
 Running the unit tests
 ----------------------
