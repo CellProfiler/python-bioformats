@@ -46,13 +46,13 @@ class TestOMEXML(unittest.TestCase):
     def test_02_02_get_text(self):
         o = O.OMEXML(TIFF_XML)
         ad = o.root_node.find(
-            "/".join([O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquiredDate")]))
+            "/".join([O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquisitionDate")]))
         self.assertEqual(O.get_text(ad), "2008-02-05T17:24:46")
         
     def test_02_04_set_text(self):
         o = O.OMEXML(TIFF_XML)
         ad = o.root_node.find("/".join(
-            [O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquiredDate")]))
+            [O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquisitionDate")]))
         im = o.root_node.find(O.qn(o.get_ns("ome"), "Image"))
         O.set_text(im, "Foo")
         self.assertEqual(O.get_text(im), "Foo")
@@ -99,14 +99,25 @@ class TestOMEXML(unittest.TestCase):
         o.image(0).Name = "Foo"
         self.assertEquals(o.image(0).node.get("Name"), "Foo")
         
-    def test_04_05_image_get_acquired_date(self):
+    def test_04_05_image_get_acquisition_date(self):
         o = O.OMEXML(TIFF_XML)
-        self.assertEqual(o.image(0).AcquiredDate, "2008-02-05T17:24:46")
+        self.assertEqual(o.image(0).AcquisitionDate, "2008-02-05T17:24:46")
         
-    def test_04_06_image_set_acquired_date(self):
+    def test_04_06_image_set_acquisition_date(self):
         o = O.OMEXML(TIFF_XML)
-        o.image(0).AcquiredDate = "2011-12-21T11:04:14.903000"
-        self.assertEqual(o.image(0).AcquiredDate, "2011-12-21T11:04:14.903000")
+        o.image(0).AcquisitionDate = "2011-12-21T11:04:14.903000"
+        self.assertEqual(o.image(0).AcquisitionDate, "2011-12-21T11:04:14.903000")
+        
+    def test_04_07_image_1_acquisition_date(self):
+        # regression test of #38
+        o = O.OMEXML()
+        o.set_image_count(2)
+        date_1 = "2011-12-21T11:04:14.903000"
+        date_2 = "2015-10-13T09:57:00.000000"
+        o.image(0).AcquisitionDate = date_1
+        o.image(1).AcquisitionDate = date_2
+        self.assertEqual(o.image(0).AcquisitionDate, date_1)
+        self.assertEqual(o.image(1).AcquisitionDate, date_2)
         
     def test_05_01_pixels_get_id(self):
         o = O.OMEXML(TIFF_XML)
@@ -736,7 +747,7 @@ TIFF_XML = """<?xml version="1.0" encoding="UTF-8"?>
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2013-06 http://www.openmicroscopy.org/Schemas/OME/2013-06/ome.xsd">
 	<Image ID="Image:0" Name="Channel1-01-A-01.tif">
-		<AcquiredDate>2008-02-05T17:24:46</AcquiredDate>
+		<AcquisitionDate>2008-02-05T17:24:46</AcquisitionDate>
 		<Pixels DimensionOrder="XYCZT" ID="Pixels:0" PhysicalSizeX="352.77777777777777"
 			PhysicalSizeY="352.77777777777777" SizeC="2" SizeT="3" SizeX="640"
 			SizeY="512" SizeZ="1" Type="uint8">
