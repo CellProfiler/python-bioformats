@@ -46,13 +46,13 @@ class TestOMEXML(unittest.TestCase):
     def test_02_02_get_text(self):
         o = O.OMEXML(TIFF_XML)
         ad = o.root_node.find(
-            "/".join([O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquiredDate")]))
+            "/".join([O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquisitionDate")]))
         self.assertEqual(O.get_text(ad), "2008-02-05T17:24:46")
         
     def test_02_04_set_text(self):
         o = O.OMEXML(TIFF_XML)
         ad = o.root_node.find("/".join(
-            [O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquiredDate")]))
+            [O.qn(o.get_ns('ome'), x) for x in ("Image", "AcquisitionDate")]))
         im = o.root_node.find(O.qn(o.get_ns("ome"), "Image"))
         O.set_text(im, "Foo")
         self.assertEqual(O.get_text(im), "Foo")
