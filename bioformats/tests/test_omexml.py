@@ -11,9 +11,11 @@
 
 import datetime
 import os
+import re
 import unittest
 import urllib
 import xml.dom
+import xml.etree.ElementTree
 
 import bioformats.omexml as O
 
@@ -31,6 +33,22 @@ class TestOMEXML(unittest.TestCase):
         o = O.OMEXML()
         self.assertEquals(o.root_node.tag, O.qn(o.get_ns("ome"), "OME"))
         self.assertEquals(o.image_count, 1)
+        
+    def test_00_01_ns_binary_file(self):
+        # regression test of issue #37
+        o = O.OMEXML()
+        xmlstr = o.to_xml()
+        tree = xml.etree.ElementTree.fromstring(xmlstr)
+        bfelements = tree.findall(".//*[@BigEndian]")
+        self.assertEqual(len(bfelements), 1)
+        #
+        # Try to find BinData with the namespace,
+        # http://www.openmicroscopy.org/Schemas/BinaryFile/YYYY-MM
+        #
+        match = re.match(
+            "\\{http://www.openmicroscopy.org/Schemas/BinaryFile/"
+            "\\d{4}-\\d{2}\\}BinData", bfelements[0].tag)
+        self.assertTrue(match is not None)
         
     def test_01_01_read(self):
         for xml in (self.GROUPFILES_XML, TIFF_XML):
