@@ -53,6 +53,8 @@ setup(
     it. Python-bioformats was developed for and is used by the cell
     image analysis software CellProfiler (cellprofiler.org).''',
     url="http://github.com/CellProfiler/python-bioformats/",
+    author="Lee Kamentsky",
+    author_email="leek@broadinstitute.org",
     packages=['bioformats'],
     classifiers=['Development Status :: 5 - Production/Stable',
                  'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
