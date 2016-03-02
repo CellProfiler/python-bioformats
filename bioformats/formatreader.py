@@ -811,8 +811,12 @@ class ImageReader(object):
             n_planes = self.rdr.getRGBChannelCount()
             rdr = ChannelSeparator(self.rdr)
             planes = [
-                np.frombuffer(rdr.openBytes(rdr.getIndex(z,i,t)),dtype)
-                for i in range(n_planes)]
+                np.frombuffer(
+                    (rdr.openBytes(rdr.getIndex(z,i,t)) if XYWH is None else
+                      rdr.openBytesXYWH(rdr.getIndex(z,i,t), XYWH[0], XYWH[1], XYWH[2], XYWH[3])),
+                      dtype
+                ) for i in range(n_planes)]
+
             if len(planes) > 3:
                 planes = planes[:3]
             elif len(planes) < 3:
