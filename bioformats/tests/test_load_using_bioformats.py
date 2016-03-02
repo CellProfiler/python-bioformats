@@ -15,14 +15,13 @@ import bioformats
 import bioformats.formatreader as formatreader
 import bioformats.metadatatools as metadatatools
 from bioformats import load_image, load_image_url
-from bioformats import log4j
 import urllib
 
 class TestLoadUsingBioformats(unittest.TestCase):
 
     def setUp(self):
         javabridge.attach()
-        log4j.basic_config()
+        bioformats.init_logger()
         
     def tearDown(self):
         javabridge.detach()
@@ -42,7 +41,7 @@ class TestLoadUsingBioformats(unittest.TestCase):
 class TestLoadUsingBioformatsURL(unittest.TestCase):
     def setUp(self):
         javabridge.attach()
-        log4j.basic_config()
+        bioformats.init_logger()
         
     def tearDown(self):
         javabridge.detach()

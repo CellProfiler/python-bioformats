@@ -16,14 +16,13 @@ import unittest
 
 import javabridge as J
 import bioformats.formatreader as F
-from bioformats import log4j
 import bioformats
 
 class TestFormatReader(unittest.TestCase):
     def setUp(self):
         J.start_vm(class_path=bioformats.JARS)
         J.attach()
-        log4j.basic_config()
+        bioformats.init_logger()
         
     def tearDown(self):
         J.detach()
