@@ -727,7 +727,6 @@ class ImageReader(object):
     def read(self, c = None, z = 0, t = 0, series = None, index = None,
              rescale = True, wants_max_intensity = False, channel_names = None, XYWH=None):
         '''Read a single plane from the image reader file.
-        :param XYWH: a (x, y, w, h) tuple
         :param c: read from this channel. `None` = read color image if multichannel
             or interleaved RGB.
         :param z: z-stack index
@@ -739,6 +738,7 @@ class ImageReader(object):
         :param wants_max_intensity: if `False`, only return the image; if `True`,
                   return a tuple of image and max intensity
         :param channel_names: provide the channel names for the OME metadata
+        :param XYWH: a (x, y, w, h) tuple
         '''
         if XYWH is not None:
             assert isinstance(XYWH, tuple) and len(XYWH) == 4, "Invalid XYWH tuple"
