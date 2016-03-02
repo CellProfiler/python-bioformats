@@ -121,6 +121,39 @@ class TestFormatReader(unittest.TestCase):
              [5, 2, 3, 3, 2, 2, 2, 3, 2, 2]], dtype=np.uint8)
         self.assertTrue(np.all(expected_0_10_0_10 == data[:10,:10]))
         self.assertTrue(np.all(expected_n10_n10 == data[-10:,-10:]))
+
+    def test_03_03_read_subimage_tif(self):
+        path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
+        with bioformats.ImageReader(path) as f:
+            data_0_10_0_10 = f.read(XYWH=(0, 0, 10, 10), rescale=False)
+
+        #
+        # Data as read by cellprofiler.modules.loadimages.load_using_PIL
+        #
+        expected_0_10_0_10 = np.array(
+            [[ 0,  7,  7,  6,  5,  8,  4,  2,  1,  2],
+             [ 0,  8,  8,  7,  6, 10,  4,  2,  2,  2],
+             [ 0,  9,  9,  7,  8,  8,  2,  1,  3,  2],
+             [ 0, 10,  9,  8, 10,  6,  2,  2,  3,  2],
+             [ 0, 10, 10, 10,  9,  4,  2,  2,  2,  2],
+             [ 0,  9,  9, 10,  8,  3,  2,  4,  2,  2],
+             [ 0,  9,  9, 10,  8,  2,  2,  4,  3,  2],
+             [ 0,  9,  8,  9,  7,  4,  2,  2,  2,  2],
+             [ 0, 10, 11,  9,  9,  4,  2,  2,  2,  2],
+             [ 0, 12, 13, 12,  9,  4,  2,  2,  2,  2]], dtype=np.uint8)
+        expected_n10_n10 = np.array(
+            [[2, 1, 1, 1, 2, 2, 1, 2, 1, 2],
+             [1, 2, 2, 2, 2, 1, 1, 1, 2, 1],
+             [1, 1, 1, 2, 1, 2, 2, 2, 2, 1],
+             [2, 2, 2, 2, 3, 2, 2, 2, 2, 1],
+             [1, 2, 2, 1, 1, 1, 1, 1, 2, 2],
+             [2, 1, 2, 2, 2, 1, 1, 2, 2, 2],
+             [2, 2, 3, 2, 2, 1, 2, 2, 2, 1],
+             [3, 3, 1, 2, 2, 2, 2, 3, 2, 2],
+             [3, 2, 2, 2, 2, 2, 2, 2, 3, 3],
+             [5, 2, 3, 3, 2, 2, 2, 3, 2, 2]], dtype=np.uint8)
+        self.assertTrue(np.all(expected_0_10_0_10 == data_0_10_0_10))
+        # self.assertTrue(np.all(expected_n10_n10 == data[-10:,-10:]))
         
     # def test_03_03_load_using_bioformats_url(self):
     #     data = F.load_using_bioformats_url(
