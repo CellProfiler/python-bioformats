@@ -9,12 +9,11 @@ import unittest
 import javabridge
 
 def basic_config():
-    javabridge.static_call("org/apache/log4j/BasicConfigurator",
-                           "configure", "()V")
-    log4j_logger = javabridge.static_call("org/apache/log4j/Logger",
-                                          "getRootLogger",
-                                          "()Lorg/apache/log4j/Logger;")
-    warn_level = javabridge.get_static_field("org/apache/log4j/Level","WARN",
-                                             "Lorg/apache/log4j/Level;")
-    javabridge.call(log4j_logger, "setLevel", "(Lorg/apache/log4j/Level;)V", 
-                    warn_level)
+    rootLoggerName = javabridge.get_static_field("org/slf4j/Logger",
+                                                 "ROOT_LOGGER_NAME", "Ljava/lang/String;")
+    rootLogger = javabridge.static_call("org/slf4j/LoggerFactory",
+                                       "getLogger", "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
+    logLevel = javabridge.get_static_field("ch/qos/logback/classic/Level",
+                                                "WARN", "Lch/qos/logback/classic/Level;")
+    javabridge.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V",
+                    logLevel)
