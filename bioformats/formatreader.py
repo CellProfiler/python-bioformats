@@ -725,9 +725,8 @@ class ImageReader(object):
             
         
     def read(self, c = None, z = 0, t = 0, series = None, index = None,
-             rescale = True, wants_max_intensity = False, channel_names = None):
+             rescale = True, wants_max_intensity = False, channel_names = None, XYWH=None):
         '''Read a single plane from the image reader file.
-        
         :param c: read from this channel. `None` = read color image if multichannel
             or interleaved RGB.
         :param z: z-stack index
@@ -739,15 +738,22 @@ class ImageReader(object):
         :param wants_max_intensity: if `False`, only return the image; if `True`,
                   return a tuple of image and max intensity
         :param channel_names: provide the channel names for the OME metadata
+        :param XYWH: a (x, y, w, h) tuple
         '''
+        if XYWH is not None:
+            assert isinstance(XYWH, tuple) and len(XYWH) == 4, "Invalid XYWH tuple"
+            openBytes_func = lambda x: self.rdr.openBytesXYWH(x, XYWH[0], XYWH[1], XYWH[2], XYWH[3])
+            width, height = XYWH[2], XYWH[3]
+        else:
+            openBytes_func = self.rdr.openBytes
+            width, height = self.rdr.getSizeX(), self.rdr.getSizeY()
         FormatTools = make_format_tools_class()
         ChannelSeparator = make_reader_wrapper_class(
             "loci/formats/ChannelSeparator")
         env = jutil.get_env()
         if series is not None:
             self.rdr.setSeries(series)
-        width = self.rdr.getSizeX()
-        height = self.rdr.getSizeY()
+
         pixel_type = self.rdr.getPixelType()
         little_endian = self.rdr.isLittleEndian()
         if pixel_type == FormatTools.INT8:
@@ -781,7 +787,7 @@ class ImageReader(object):
             except:
                 logger.warning("WARNING: failed to get MaxSampleValue for image. Intensities may be improperly scaled.")
         if index is not None:
-            image = np.frombuffer(self.rdr.openBytes(index), dtype)
+            image = np.frombuffer(openBytes_func(index), dtype)
             if len(image) / height / width in (3,4):
                 n_channels = int(len(image) / height / width)
                 if self.rdr.isInterleaved():
@@ -793,20 +799,24 @@ class ImageReader(object):
                 image.shape = (height, width)
         elif self.rdr.isRGB() and self.rdr.isInterleaved():
             index = self.rdr.getIndex(z,0,t)
-            image = np.frombuffer(self.rdr.openBytes(index), dtype)
+            image = np.frombuffer(openBytes_func(index), dtype)
             image.shape = (height, width, self.rdr.getSizeC())
             if image.shape[2] > 3:
                 image = image[:, :, :3]
         elif c is not None and self.rdr.getRGBChannelCount() == 1:
             index = self.rdr.getIndex(z,c,t)
-            image = np.frombuffer(self.rdr.openBytes(index), dtype)
+            image = np.frombuffer(openBytes_func(index), dtype)
             image.shape = (height, width)
         elif self.rdr.getRGBChannelCount() > 1:
             n_planes = self.rdr.getRGBChannelCount()
             rdr = ChannelSeparator(self.rdr)
             planes = [
-                np.frombuffer(rdr.openBytes(rdr.getIndex(z,i,t)),dtype)
-                for i in range(n_planes)]
+                np.frombuffer(
+                    (rdr.openBytes(rdr.getIndex(z,i,t)) if XYWH is None else
+                      rdr.openBytesXYWH(rdr.getIndex(z,i,t), XYWH[0], XYWH[1], XYWH[2], XYWH[3])),
+                      dtype
+                ) for i in range(n_planes)]
+
             if len(planes) > 3:
                 planes = planes[:3]
             elif len(planes) < 3:
@@ -818,7 +828,7 @@ class ImageReader(object):
             del rdr
         elif self.rdr.getSizeC() > 1:
             images = [
-                np.frombuffer(self.rdr.openBytes(self.rdr.getIndex(z,i,t)), dtype)
+                np.frombuffer(openBytes_func(self.rdr.getIndex(z,i,t)), dtype)
                       for i in range(self.rdr.getSizeC())]   
             image = np.dstack(images)
             image.shape = (height, width, self.rdr.getSizeC())
@@ -837,7 +847,7 @@ class ImageReader(object):
             # a monochrome RGB image
             #
             index = self.rdr.getIndex(z,0,t)
-            image = np.frombuffer(self.rdr.openBytes(index),dtype)
+            image = np.frombuffer(openBytes_func(index),dtype)
             if pixel_type in (FormatTools.INT16, FormatTools.UINT16):
                 lut = self.rdr.get16BitLookupTable()
                 if lut is not None:
@@ -858,7 +868,7 @@ class ImageReader(object):
                 image = lut[image, :]
         else:
             index = self.rdr.getIndex(z,0,t)
-            image = np.frombuffer(self.rdr.openBytes(index),dtype)
+            image = np.frombuffer(openBytes_func(index),dtype)
             image.shape = (height,width)
             
         if rescale:
