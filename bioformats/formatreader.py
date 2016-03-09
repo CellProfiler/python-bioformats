@@ -959,7 +959,7 @@ def load_using_bioformats(path, c=None, z=0, t=0, series=None, index=None,
         return rdr.read(c, z, t, series, index, rescale, wants_max_intensity,
                         channel_names)
     
-def get_omexml_metadata(path=None, url=None):
+def get_omexml_metadata(path=None, url=None, groupfiles=False):
     '''Read the OME metadata from a file using Bio-formats
     
     :param path: path to the file
@@ -970,6 +970,8 @@ def get_omexml_metadata(path=None, url=None):
     :returns: the metdata as XML.
 
     '''
+    if not isinstance(groupfiles, bool):
+        groupfiles = False
     with ImageReader(path=path, url=url, perform_init=False) as rdr:
         #
         # Below, "in" is a keyword and Rhino's parser is just a little wonky I fear.
@@ -982,7 +984,7 @@ def get_omexml_metadata(path=None, url=None):
                     Packages.loci.formats.services.OMEXMLService,
                     Packages.loci.formats['in'].DefaultMetadataOptions,
                     Packages.loci.formats['in'].MetadataLevel);
-        reader.setGroupFiles(false);
+        reader.setGroupFiles(""" + str(groupfiles).lower() + """);
         reader.setOriginalMetadataPopulated(true);
         var service = new ServiceFactory().getInstance(OMEXMLService);
         var metadata = service.createOMEXMLMetadata();
