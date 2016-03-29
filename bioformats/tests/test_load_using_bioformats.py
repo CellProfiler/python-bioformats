@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import exceptions
 import os
 import unittest
 
@@ -37,8 +36,7 @@ class TestLoadUsingBioformats(unittest.TestCase):
     def test_file_not_found(self):
         # Regression test of issue #6
         path = os.path.join(os.path.dirname(__file__), 'Channel5-01-A-01.tif')
-        self.assertRaises(exceptions.IOError,
-                          lambda :load_image(path))
+        self.assertRaises(IOError, lambda :load_image(path))
 
 class TestLoadUsingBioformatsURL(unittest.TestCase):
     def setUp(self):

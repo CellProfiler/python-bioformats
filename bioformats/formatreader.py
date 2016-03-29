@@ -29,7 +29,6 @@ __version__ = "$Revision$"
 import logging
 logger = logging.getLogger(__name__)
 import errno
-import exceptions
 import numpy as np
 import os
 import sys
@@ -582,11 +581,11 @@ class ImageReader(object):
                                 logger.warn(line)
                             if jutil.is_instance_of(
                                 je, "java/io/FileNotFoundException"):
-                                raise exceptions.IOError(
-                                    errno.ENOENT, 
+                                raise IOError(
+                                    errno.ENOENT,
                                     "The file, \"%s\", does not exist." % path,
                                     path)
-                            e2 = exceptions.IOError(
+                            e2 = IOError(
                                 errno.EINVAL, "Could not load the file as an image (see log for details)", path.encode('utf-8'))
                             raise e2
             else:
@@ -614,8 +613,8 @@ class ImageReader(object):
             filename = os.path.split(path)[1]
 
         if not os.path.isfile(self.path):
-            raise exceptions.IOError(
-                errno.ENOENT, 
+            raise IOError(
+                errno.ENOENT,
                 "The file, \"%s\", does not exist." % path,
                 path)
 
@@ -716,11 +715,11 @@ class ImageReader(object):
                                 "()Ljava/lang/Throwable;")
             if jutil.is_instance_of(
                 je, "java/io/FileNotFoundException"):
-                raise exceptions.IOError(
-                    errno.ENOENT, 
+                raise IOError(
+                    errno.ENOENT,
                     "The file, \"%s\", does not exist." % path,
                     path)
-            e2 = exceptions.IOError(
+            e2 = IOError(
                 errno.EINVAL, "Could not load the file as an image (see log for details)",
                 self.path.encode('utf-8'))
             raise e2
