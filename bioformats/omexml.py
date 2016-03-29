@@ -17,8 +17,10 @@ from xml.etree import cElementTree as ElementTree
 import sys
 if sys.version_info.major == 3:
     from io import StringIO
+    uenc = 'unicode'
 else:
     from cStringIO import StringIO
+    uenc = 'utf-8'
 
 import datetime
 import logging
@@ -333,11 +335,11 @@ class OMEXML(object):
         ElementTree.register_namespace("om", NS_ORIGINAL_METADATA)
         result = StringIO()
         ElementTree.ElementTree(self.root_node).write(result,
-                                          encoding = "utf-8",
-                                          method = "xml")
+                                                      encoding=uenc,
+                                                      method="xml")
         return result.getvalue()
 
-    def to_xml(self, indent="\t", newline="\n", encoding = "utf-8"):
+    def to_xml(self, indent="\t", newline="\n", encoding=uenc):
         return str(self)
 
     def get_ns(self, key):
