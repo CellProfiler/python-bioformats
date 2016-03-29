@@ -13,7 +13,13 @@ from __future__ import absolute_import, unicode_literals
 
 import xml.etree.ElementTree
 from xml.etree import cElementTree as ElementTree
-from cStringIO import StringIO
+
+import sys
+if sys.version_info.major == 3:
+    from io import StringIO
+else:
+    from cStringIO import StringIO
+
 import datetime
 import logging
 from functools import reduce
