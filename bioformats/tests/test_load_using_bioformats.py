@@ -53,7 +53,7 @@ class TestLoadUsingBioformatsURL(unittest.TestCase):
 
     def test_01_01_open_file(self):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
-        url = "file:" + pathname2url(path).encode("utf-8")
+        url = "file:" + pathname2url(path)
         image, scale = load_image_url(
             url, rescale=False, wants_max_intensity=True)
         self.assertEqual(image.shape[0], 640)
@@ -71,7 +71,7 @@ class TestLoadUsingBioformatsURL(unittest.TestCase):
         # raise an exception when converting URL to string
         #
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
-        url = "file:" + pathname2url(path).encode("utf-8")
+        url = "file:" + pathname2url(path)
         image, scale = load_image_url(
             url, rescale=False, wants_max_intensity=True)
         self.assertEqual(image.shape[0], 640)
