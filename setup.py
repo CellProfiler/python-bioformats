@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 import os.path
 import re
 import subprocess
@@ -20,14 +22,14 @@ def get_version():
         except:
             pass
 
-    version_file = os.path.join(os.path.dirname(__file__), 'bioformats', 
+    version_file = os.path.join(os.path.dirname(__file__), 'bioformats',
                                 '_version.py')
     if os.path.exists(version_file):
         with open(version_file) as f:
             cached_version_line = f.read().strip()
         try:
             # From http://stackoverflow.com/a/3619714/17498
-            cached_version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", 
+            cached_version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                                        cached_version_line, re.M).group(1)
         except:
             raise RuntimeError("Unable to find version in %s" % version_file)
@@ -36,13 +38,13 @@ def get_version():
 
     if git_version and git_version != cached_version:
         with open(version_file, 'w') as f:
-            print >>f, '__version__ = "%s"' % git_version
+            print('__version__ = "%s"' % git_version, file=f)
 
     return git_version or cached_version
 
 setup(
     name="python-bioformats",
-    version=get_version(),
+    version=get_version().decode("utf-8"),
     description="Read and write life sciences file formats",
     long_description='''Python-bioformats is a Python wrapper for Bio-Formats, a standalone
     Java library for reading and writing life sciences image file

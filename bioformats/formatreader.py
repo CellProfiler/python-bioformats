@@ -1,7 +1,7 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
@@ -9,7 +9,7 @@
 
 Example:
     import bioformats.formatreader as biordr
-    
+
     env = biordr.get_env()
 
     ChannelSeparator = biordr.make_reader_wrapper_class(env, 'loci/formats/ChannelSeparator')
@@ -21,7 +21,9 @@ Example:
         [cs.open_bytes(cs.getIndex(0,i,0)) for i in range(3)]
 
 '''
-    
+
+from __future__ import absolute_import, unicode_literals
+
 __version__ = "$Revision$"
 
 import logging
@@ -52,13 +54,13 @@ K_OMERO_PASSWORD = "omero_password"
 
 def make_format_tools_class():
     '''Get a wrapper for the loci/formats/FormatTools class
-    
+
     The FormatTools class has many of the constants needed by
     other classes as statics.
     '''
     class FormatTools(object):
         '''A wrapper for loci.formats.FormatTools
-        
+
         See http://hudson.openmicroscopy.org.uk/job/LOCI/javadoc/loci/formats/FormatTools.html
         '''
         env = jutil.get_env()
@@ -74,23 +76,23 @@ def make_format_tools_class():
         UINT16 = jutil.get_static_field(klass, 'UINT16', 'I')
         UINT32 = jutil.get_static_field(klass, 'UINT32', 'I')
         UINT8 = jutil.get_static_field(klass, 'UINT8', 'I')
-        
+
         @classmethod
         def getPixelTypeString(cls, pixel_type):
             return jutil.static_call('loci/formats/FormatTools', 'getPixelTypeString', '(I)Ljava/lang/String;', pixel_type)
-        
+
     return FormatTools
 
 def make_iformat_reader_class():
     '''Bind a Java class that implements IFormatReader to a Python class
-    
+
     Returns a class that implements IFormatReader through calls to the
     implemented class passed in. The returned class can be subclassed to
     provide additional bindings.
     '''
     class IFormatReader(object):
         '''A wrapper for loci.formats.IFormatReader
-        
+
         See http://hudson.openmicroscopy.org.uk/job/LOCI/javadoc/loci/formats/ImageReader.html
         '''
         close = jutil.make_method('close','()V',
@@ -144,13 +146,13 @@ def make_iformat_reader_class():
                                       'Get the specified image plane as a byte array')
         openBytesXYWH = jutil.make_method('openBytes','(IIIII)[B',
                                           '''Get the specified image plane as a byte array
-                                          
+
                                           (corresponds to openBytes(int no, int x, int y, int w, int h))
                                           no - image plane number
                                           x,y - offset into image
                                           w,h - dimensions of image to return''')
         setSeries = jutil.make_method('setSeries','(I)V','Set the currently selected image series')
-        setGroupFiles = jutil.make_method('setGroupFiles', '(Z)V', 
+        setGroupFiles = jutil.make_method('setGroupFiles', '(Z)V',
                                           'Force reader to group or not to group files in a multi-file set')
         setMetadataStore = jutil.make_method('setMetadataStore',
                                              '(Lloci/formats/meta/MetadataStore;)V',
@@ -166,9 +168,9 @@ def make_iformat_reader_class():
             'isThisType',
             '(Ljava/lang/String;Z)Z',
             '''Return true if the named file is handled by this reader.
-            
+
             filename - name of file
-            
+
             allowOpen - True if the reader is allowed to open files
                         when making its determination
             ''')
@@ -176,17 +178,17 @@ def make_iformat_reader_class():
             'isThisType',
             '(Lloci/common/RandomAccessInputStream;)Z',
             '''Return true if the stream might be parseable by this reader.
-            
+
             stream - the RandomAccessInputStream to be used to read the file contents
-            
+
             Note that both isThisTypeS and isThisTypeStream must return true
             for the type to truly be handled.''')
         def setId(self, path):
             '''Set the name of the file'''
-            jutil.call(self.o, 'setId', 
+            jutil.call(self.o, 'setId',
                        '(Ljava/lang/String;)V',
                        path)
-                                            
+
         getMetadataStore = jutil.make_method('getMetadataStore', '()Lloci/formats/meta/MetadataStore;',
                                              'Retrieves the current metadata store for this reader.')
         get8BitLookupTable = jutil.make_method(
@@ -198,7 +200,7 @@ def make_iformat_reader_class():
         def get_class_name(self):
             return jutil.call(jutil.call(self.o, 'getClass', '()Ljava/lang/Class;'),
                               'getName', '()Ljava/lang/String;')
-        
+
         @property
         def suffixNecessary(self):
             if self.get_class_name() == 'loci.formats.in.JPKReader':
@@ -209,7 +211,7 @@ def make_iformat_reader_class():
             if field_id is None:
                 return None
             return env.get_boolean_field(self.o, field_id)
-            
+
         @property
         def suffixSufficient(self):
             if self.get_class_name() == 'loci.formats.in.JPKReader':
@@ -220,8 +222,8 @@ def make_iformat_reader_class():
             if field_id is None:
                 return None
             return env.get_boolean_field(self.o, field_id)
-            
-            
+
+
     return IFormatReader
 
 def get_class_list():
@@ -239,13 +241,13 @@ def get_class_list():
         get_classes = jutil.make_method(
             'getClasses', '()[Ljava/lang/Class;',
             'Get the classes in the list as an array')
-            
+
         def __init__(self):
             env = jutil.get_env()
             class_name = 'loci/formats/ImageReader'
             klass = env.find_class(class_name)
             base_klass = env.find_class('loci/formats/IFormatReader')
-            self.o = jutil.make_instance("loci/formats/ClassList", 
+            self.o = jutil.make_instance("loci/formats/ClassList",
                                          "(Ljava/lang/String;"
                                          "Ljava/lang/Class;" # base
                                          "Ljava/lang/Class;)V", # location in jar
@@ -267,8 +269,8 @@ def get_class_list():
                 self.remove_class(klass)
                 self.add_class(klass)
     return ClassList()
-    
-    
+
+
 def make_image_reader_class():
     '''Return an image reader class for the given Java environment'''
     env = jutil.get_env()
@@ -277,7 +279,7 @@ def make_image_reader_class():
     base_klass = env.find_class('loci/formats/IFormatReader')
     IFormatReader = make_iformat_reader_class()
     class_list = get_class_list()
-        
+
     class ImageReader(IFormatReader):
         new_fn = jutil.make_new(class_name, '(Lloci/formats/ClassList;)V')
         def __init__(self):
@@ -289,7 +291,7 @@ def make_image_reader_class():
                                       '()Lloci/formats/IFormatReader;')
         def allowOpenToCheckType(self, allow):
             '''Allow the "isThisType" function to open files
-            
+
             For the cluster, you want to tell potential file formats
             not to open the image file to test if it's their format.
             '''
@@ -306,8 +308,8 @@ def make_image_reader_class():
                 jexception = jutil.get_env().exception_occurred()
                 if jexception is not None:
                     raise jutil.JavaException(jexception)
-                
-                boolean_value = jutil.make_instance('java/lang/Boolean', 
+
+                boolean_value = jutil.make_instance('java/lang/Boolean',
                                                     '(Z)V', allow)
                 args = jutil.get_env().make_object_array(1, object_class)
                 jexception = jutil.get_env().exception_occurred()
@@ -320,26 +322,26 @@ def make_image_reader_class():
                 self.allowOpenToCheckType_method.invoke(self.o, args)
     return ImageReader
 
-        
+
 def make_reader_wrapper_class(class_name):
     '''Make an ImageReader wrapper class
-    
-    class_name - the name of the wrapper class, for instance, 
+
+    class_name - the name of the wrapper class, for instance,
                  "loci/formats/ChannelSeparator"
-    
+
     You can instantiate an instance of the wrapper class like this:
     rdr = ChannelSeparator(ImageReader())
     '''
     IFormatReader = make_iformat_reader_class()
     class ReaderWrapper(IFormatReader):
         __doc__ = '''A wrapper for %s
-        
+
         See http://hudson.openmicroscopy.org.uk/job/LOCI/javadoc/loci/formats/ImageReader.html
         '''%class_name
         new_fn = jutil.make_new(class_name, '(Lloci/formats/IFormatReader;)V')
         def __init__(self, rdr):
             self.new_fn(rdr)
-            
+
         setId = jutil.make_method('setId', '(Ljava/lang/String;)V',
                                   'Set the name of the data file')
     return ReaderWrapper
@@ -347,7 +349,7 @@ def make_reader_wrapper_class(class_name):
 __has_omero_jars = None
 def has_omero_packages():
     '''Return True if we can find the packages needed for OMERO
-    
+
     In order to run OMERO, you'll need the OMERO client and ICE
     on your class path (not supplied with python-bioformats and
     specific to your server's version)
@@ -357,11 +359,11 @@ def has_omero_packages():
         class_loader = jutil.static_call(
             "java/lang/ClassLoader", "getSystemClassLoader",
             "()Ljava/lang/ClassLoader;")
-        for klass in ("Glacier2.PermissionDeniedException", 
+        for klass in ("Glacier2.PermissionDeniedException",
                       "loci.ome.io.OmeroReader", "omero.client"):
             try:
                 jutil.call(
-                    class_loader, "loadClass", 
+                    class_loader, "loadClass",
                     "(Ljava/lang/String;)Ljava/lang/Class;", klass)
             except:
                 __has_omero_jars = False
@@ -382,7 +384,7 @@ __omero_password = None
 
 def set_omero_credentials(omero_server, omero_port, omero_username, omero_password):
     '''Set the credentials to be used to connect to the Omero server
-    
+
     :param omero_server: DNS name of the server
 
     :param omero_port: use this port to connect to the server
@@ -390,7 +392,7 @@ def set_omero_credentials(omero_server, omero_port, omero_username, omero_passwo
     :param omero_username: log on as this user
 
     :param omero_password: log on using this password
-    
+
     The session ID is valid after this function is called. An exception is thrown
     if the login fails. :func:`bioformats.omero_logout()` can be called to log out.
 
@@ -413,16 +415,16 @@ def set_omero_credentials(omero_server, omero_port, omero_username, omero_passwo
         user = __omero_username,
         password = omero_password))
     return __omero_session_id
-    
+
 def get_omero_credentials():
     '''Return a pickleable dictionary representing the Omero credentials.
-    
+
     Call :func:`bioformats.use_omero_credentials` in some other process to use this.
 
     '''
     if __omero_session_id is None:
         omero_login()
-        
+
     return dict(omero_server = __omero_server,
                 omero_port = __omero_port,
                 omero_user = __omero_username,
@@ -439,21 +441,21 @@ def omero_login():
         env = jutil.get_env()
         config = env.make_object_array(1, env.find_class("java/lang/String"))
         env.set_object_array_element(
-            config, 0, env.new_string(u"--Ice.Config=%s" % __omero_config_file))
+            config, 0, env.new_string("--Ice.Config=%s" % __omero_config_file))
         script = """
         var client = Packages.omero.client(config);
         client.createSession();
         client.getSessionId();
         """
         __omero_session_id = jutil.run_script(script, dict(config=config))
-    elif all([x is not None for x in 
-              __omero_server, __omero_port, __omero_username, __omero_password]):
-        set_omero_credentials(__omero_server, __omero_port, __omero_username, 
+    elif all([x is not None for x in
+              (__omero_server, __omero_port, __omero_username, __omero_password)]):
+        set_omero_credentials(__omero_server, __omero_port, __omero_username,
                               __omero_password)
     else:
         __omero_login_fn()
     return __omero_session_id
-    
+
 def omero_logout():
     '''Abandon any current Omero session.
 
@@ -463,7 +465,7 @@ def omero_logout():
 
 def use_omero_credentials(credentials):
     '''Use the session ID from an existing login as credentials.
-    
+
     :param credentials: credentials from get_omero_credentials.
 
     '''
@@ -479,7 +481,7 @@ def use_omero_credentials(credentials):
     __omero_session_id = credentials.get(K_OMERO_SESSION_ID, None)
     __omero_config_file = credentials.get(K_OMERO_CONFIG_FILE, None)
     __omero_password = credentials.get(K_OMERO_PASSWORD, None)
-    
+
 __omero_login_fn = None
 def set_omero_login_hook(fn):
     '''Set the function to be called when a login to Omero is needed.
@@ -487,7 +489,7 @@ def set_omero_login_hook(fn):
     '''
     global __omero_login_fn
     __omero_login_fn = fn
-    
+
 def get_omero_reader():
     '''Return an ``loci.ome.io.OMEROReader`` instance, wrapped as a FormatReader.
 
@@ -502,13 +504,13 @@ def get_omero_reader():
     """
     if __omero_session_id is None:
         omero_login()
-        
+
     jrdr = jutil.run_script(script, dict(
         server = __omero_server,
         port = __omero_port,
         username = __omero_username,
         sessionID = __omero_session_id))
-        
+
     rdr = make_iformat_reader_class()()
     rdr.o = jrdr
     return rdr
@@ -519,21 +521,21 @@ def load_using_bioformats_url(url, c=None, z=0, t=0, series=None, index=None,
                           wants_max_intensity = False,
                           channel_names = None):
     '''Load a file from Bio-formats via a URL
-    
+
     '''
     with ImageReader(url=url) as rdr:
         return rdr.read(c, z, t, series, index, rescale, wants_max_intensity,
                         channel_names)
-    
+
 
 class ImageReader(object):
     '''Find the appropriate reader for a file.
-    
+
     This class is meant to be harnessed to a scope like this:
-    
+
     >>> with GetImageReader(path) as reader:
     >>>     ....
-        
+
     It uses `__enter__` and `__exit__` to manage the random access stream
     that can be used to cache the file contents in memory.
 
@@ -547,7 +549,7 @@ class ImageReader(object):
         if url is not None and url.lower().startswith(file_scheme):
             utf8_url = urllib.url2pathname(url[len(file_scheme):])
             if isinstance(utf8_url, str):
-                path = unicode(utf8_url, 'utf-8')
+                path = str(utf8_url, 'utf-8')
             else:
                 path = utf8_url
         self.path = path
@@ -564,11 +566,11 @@ class ImageReader(object):
                         if perform_init:
                             self.init_reader()
                         return
-                    except jutil.JavaException, e:
+                    except jutil.JavaException as e:
                         je = e.throwable
                         if jutil.is_instance_of(
                             je, "loci/formats/FormatException"):
-                            je = jutil.call(je, "getCause", 
+                            je = jutil.call(je, "getCause",
                                             "()Ljava/lang/Throwable;")
                         if jutil.is_instance_of(
                             je, "Glacier2/PermissionDeniedException"):
@@ -616,11 +618,11 @@ class ImageReader(object):
                 errno.ENOENT, 
                 "The file, \"%s\", does not exist." % path,
                 path)
-            
+
         self.stream = jutil.make_instance('loci/common/RandomAccessInputStream',
-                                          '(Ljava/lang/String;)V', 
+                                          '(Ljava/lang/String;)V',
                                           self.path)
-            
+
         self.rdr = None
         class_list = get_class_list()
         find_rdr_script = """
@@ -668,13 +670,13 @@ class ImageReader(object):
         self.rdr.o = jrdr
         if perform_init:
             self.init_reader()
-        
+
     def __enter__(self):
         return self
-        
+
     def __exit__(self, type_class, value, traceback):
         self.close()
-        
+
     def close(self):
         if hasattr(self, "rdr"):
             self.rdr.close()
@@ -690,7 +692,7 @@ class ImageReader(object):
         # Run the Java garbage collector here.
         #
         jutil.static_call("java/lang/System", "gc","()V")
-        
+
     def init_reader(self):
         mdoptions = metadatatools.get_metadata_options(metadatatools.ALL)
         self.rdr.setMetadataOptions(mdoptions)
@@ -699,7 +701,7 @@ class ImageReader(object):
         self.rdr.setMetadataStore(self.metadata)
         try:
             self.rdr.setId(self.path)
-        except jutil.JavaException, e:
+        except jutil.JavaException as e:
             logger.warn(e.message)
             for line in traceback.format_exc().split("\n"):
                 logger.warn(line)
@@ -710,7 +712,7 @@ class ImageReader(object):
                 raise
             if jutil.is_instance_of(
                 je, "loci/formats/FormatException"):
-                je = jutil.call(je, "getCause", 
+                je = jutil.call(je, "getCause",
                                 "()Ljava/lang/Throwable;")
             if jutil.is_instance_of(
                 je, "java/io/FileNotFoundException"):
@@ -722,8 +724,8 @@ class ImageReader(object):
                 errno.EINVAL, "Could not load the file as an image (see log for details)",
                 self.path.encode('utf-8'))
             raise e2
-            
-        
+
+
     def read(self, c = None, z = 0, t = 0, series = None, index = None,
              rescale = True, wants_max_intensity = False, channel_names = None, XYWH=None):
         '''Read a single plane from the image reader file.
@@ -829,7 +831,7 @@ class ImageReader(object):
         elif self.rdr.getSizeC() > 1:
             images = [
                 np.frombuffer(openBytes_func(self.rdr.getIndex(z,i,t)), dtype)
-                      for i in range(self.rdr.getSizeC())]   
+                      for i in range(self.rdr.getSizeC())]
             image = np.dstack(images)
             image.shape = (height, width, self.rdr.getSizeC())
             if not channel_names is None:
@@ -870,7 +872,7 @@ class ImageReader(object):
             index = self.rdr.getIndex(z,0,t)
             image = np.frombuffer(openBytes_func(index),dtype)
             image.shape = (height,width)
-            
+
         if rescale:
             image = image.astype(np.float32) / float(scale)
         if wants_max_intensity:
@@ -898,9 +900,9 @@ __image_reader_cache = {}
 
 def get_image_reader(key, path=None, url=None):
     '''Make or find an image reader appropriate for the given path
-    
+
     path - pathname to the reader on disk.
-    
+
     key - use this key to keep only a single cache member associated with
           that key open at a time.
     '''
@@ -921,7 +923,7 @@ def get_image_reader(key, path=None, url=None):
 
 def release_image_reader(key):
     '''Tell the cache that it should flush the reference for the given key
-    
+
     '''
     if key in __image_reader_key_cache:
         path, url = __image_reader_key_cache[key]
@@ -939,31 +941,31 @@ def clear_image_reader_cache():
         rdr.close()
     __image_reader_cache.clear()
     __image_reader_key_cache.clear()
-    
+
 def load_using_bioformats(path, c=None, z=0, t=0, series=None, index=None,
                           rescale = True,
                           wants_max_intensity = False,
                           channel_names = None):
     '''Load the given image file using the Bioformats library.
-    
+
     :param path: path to the file
     :param z: the frame index in the `z` (depth) dimension.
     :param t: the frame index in the time dimension.
     :param channel_names: `None` if you don't want them, a list which will be filled if you do.
-    
+
     :returns: either a 2-d (grayscale) or 3-d (2-d + 3 RGB planes) image.
 
     '''
-    
+
     with ImageReader(path=path) as rdr:
         return rdr.read(c, z, t, series, index, rescale, wants_max_intensity,
                         channel_names)
-    
+
 def get_omexml_metadata(path=None, url=None):
     '''Read the OME metadata from a file using Bio-formats
-    
+
     :param path: path to the file
-    
+
     :param groupfiles: utilize the groupfiles option to take the directory structure
                  into account.
 

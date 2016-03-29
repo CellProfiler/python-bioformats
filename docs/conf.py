@@ -11,6 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from __future__ import absolute_import, unicode_literals
+
 import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -40,8 +42,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'python-bioformats'
-copyright = u'2014, Broad Institute of MIT and Harvard'
+project = 'python-bioformats'
+copyright = '2014, Broad Institute of MIT and Harvard'
 
 def get_version():
     version_file = os.path.join(os.path.dirname(__file__), '..', 'bioformats',
@@ -52,7 +54,7 @@ def get_version():
         try:
             import re
             # From http://stackoverflow.com/a/3619714/17498
-            cached_version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", 
+            cached_version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                                        cached_version_line, re.M).group(1)
         except:
             raise RuntimeError("Unable to find version in %s" % version_file)
@@ -203,8 +205,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'python-bioformats.tex', u'python-bioformats Documentation',
-   u'Lee Kamentsky, Vebjorn Ljosa', 'manual'),
+  ('index', 'python-bioformats.tex', 'python-bioformats Documentation',
+   'Lee Kamentsky, Vebjorn Ljosa', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -233,8 +235,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'python-bioformats', u'python-bioformats Documentation',
-     [u'Lee Kamentsky, Vebjorn Ljosa'], 1)
+    ('index', 'python-bioformats', 'python-bioformats Documentation',
+     ['Lee Kamentsky, Vebjorn Ljosa'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -247,8 +249,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'python-bioformats', u'python-bioformats Documentation',
-   u'Lee Kamentsky, Vebjorn Ljosa', 'python-bioformats', 'One line description of project.',
+  ('index', 'python-bioformats', 'python-bioformats Documentation',
+   'Lee Kamentsky, Vebjorn Ljosa', 'python-bioformats', 'One line description of project.',
    'Miscellaneous'),
 ]
 

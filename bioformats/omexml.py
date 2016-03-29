@@ -1,7 +1,7 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
@@ -9,11 +9,14 @@
 
 """
 
+from __future__ import absolute_import, unicode_literals
+
 import xml.etree.ElementTree
 from xml.etree import cElementTree as ElementTree
 from cStringIO import StringIO
 import datetime
 import logging
+from functools import reduce
 logger = logging.getLogger(__file__)
 import re
 import uuid
@@ -32,23 +35,23 @@ NS_DEFAULT = "http://www.openmicroscopy.org/Schemas/{ns_key}/2013-06"
 NS_RE = r"http://www.openmicroscopy.org/Schemas/(?P<ns_key>.*)/[0-9/-]"
 
 default_xml = """<?xml version="1.0" encoding="UTF-8"?>
-<OME xmlns="{ns_ome_default}s" 
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<OME xmlns="{ns_ome_default}s"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2013-06 http://www.openmicroscopy.org/Schemas/OME/2012-03/ome.xsd">
   <Image ID="Image:0" Name="default.png">
     <AcquisitionDate>%(DEFAULT_NOW)s</AcquisitionDate>
-    <Pixels DimensionOrder="XYCTZ" 
-            ID="Pixels:0" 
-            SizeC="1" 
-            SizeT="1" 
-            SizeX="512" 
+    <Pixels DimensionOrder="XYCTZ"
+            ID="Pixels:0"
+            SizeC="1"
+            SizeT="1"
+            SizeX="512"
             SizeY="512"
             SizeZ="1"
             Type="uint8">
 <Channel ID="Channel:0:0" SamplesPerPixel="1">
         <LightPath/>
       </Channel>
-      <BinData xmlns="%(NS_BINARY_FILE)s" 
+      <BinData xmlns="%(NS_BINARY_FILE)s"
        BigEndian="false" Length="0"/>
     </Pixels>
   </Image>
@@ -80,7 +83,7 @@ DO_XYTCZ = "XYTCZ"
 DO_XYTZC = "XYTZC"
 #
 # Original metadata corresponding to TIFF tags
-# The text for these can be found in 
+# The text for these can be found in
 # loci.formats.in.BaseTiffReader.initStandardMetadata
 #
 '''IFD # 254'''
@@ -196,9 +199,9 @@ NC_NUMBER = "number"
 
 def page_name_original_metadata(index):
     '''Get the key name for the page name metadata data for the indexed tiff page
-    
+
     These are TIFF IFD #'s 285+
-    
+
     index - zero-based index of the page
     '''
     return "PageName #%d" % index
@@ -213,7 +216,7 @@ def set_text(node, text):
 
 def qn(namespace, tag_name):
     '''Return the qualified name for a given namespace and tag name
-    
+
     This is the ElementTree representation of a qualified name
     '''
     return "{%s}%s" % (namespace, tag_name)
@@ -246,7 +249,7 @@ def get_int_attr(node, attribute):
 
 def make_text_node(parent, namespace, tag_name, text):
     '''Either make a new node and add the given text or replace the text
-    
+
     parent - the parent node to the node to be created or found
     namespace - the namespace of the node's qualified name
     tag_name - the tag name of  the node's qualified name
@@ -260,51 +263,51 @@ def make_text_node(parent, namespace, tag_name, text):
 
 class OMEXML(object):
     '''Reads and writes OME-XML with methods to get and set it.
-    
+
     The OMEXML class has four main purposes: to parse OME-XML, to output
     OME-XML, to provide a structured mechanism for inspecting OME-XML and to
     let the caller create and modify OME-XML.
-    
+
     There are two ways to invoke the constructor. If you supply XML as a string
     or unicode string, the constructor will parse it and will use it as the
     base for any inspection and modification. If you don't supply XML, you'll
     get a bland OME-XML object which has a one-channel image. You can modify
     it programatically and get the modified OME-XML back out by calling to_xml.
-    
+
     There are two ways to get at the XML. The arduous way is to get the
     root_node of the DOM and explore it yourself using the DOM API
     (http://docs.python.org/library/xml.dom.html#module-xml.dom). The easy way,
     where it's supported is to use properties on OMEXML and on some of its
     derived objects. For instance:
-    
+
     >>> o = OMEXML()
     >>> print o.image().AcquisitionDate
-    
+
     will get you the date that image # 0 was acquired.
-    
+
     >>> o = OMEXML()
     >>> o.image().Name = "MyImage"
-    
+
     will set the image name to "MyImage".
-    
+
     You can add and remove objects using the "count" properties. Each of these
     handles hooking up and removing orphaned elements for you and should be
     less error prone than creating orphaned elements and attaching them. For
     instance, to create a three-color image:
-    
+
     >>> o = OMEXML()
     >>> o.image().Pixels.channel_count = 3
     >>> o.image().Pixels.Channel(0).Name = "Red"
     >>> o.image().Pixels.Channel(1).Name = "Green"
     >>> o.image().Pixels.Channel(2).Name = "Blue"
-    
+
     See the `OME-XML schema documentation <http://git.openmicroscopy.org/src/develop/components/specification/Documentation/Generated/OME-2011-06/ome.html>`_.
 
     '''
     def __init__(self, xml=None):
         if xml is None:
             xml = default_xml
-        if isinstance(xml, unicode):
+        if isinstance(xml, str):
             xml = xml.encode("utf-8")
         self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
 
@@ -323,11 +326,11 @@ class OMEXML(object):
             ElementTree.register_namespace(ns_key, ns)
         ElementTree.register_namespace("om", NS_ORIGINAL_METADATA)
         result = StringIO()
-        ElementTree.ElementTree(self.root_node).write(result, 
-                                          encoding = "utf-8", 
+        ElementTree.ElementTree(self.root_node).write(result,
+                                          encoding = "utf-8",
                                           method = "xml")
         return result.getvalue()
-    
+
     def to_xml(self, indent="\t", newline="\n", encoding = "utf-8"):
         return str(self)
 
@@ -337,11 +340,11 @@ class OMEXML(object):
     @property
     def root_node(self):
         return self.dom.getroot()
-    
+
     def get_image_count(self):
         '''The number of images (= series) specified by the XML'''
         return len(self.root_node.findall(qn(self.ns['ome'], "Image")))
-    
+
     def set_image_count(self, value):
         '''Add or remove image nodes as needed'''
         assert value > 0
@@ -370,17 +373,17 @@ class OMEXML(object):
             new_channel.ID = "Channel%d:0" % self.image_count
             new_channel.Name = new_channel.ID
             new_channel.SamplesPerPixel = 1
-            
+
     image_count = property(get_image_count, set_image_count)
-    
+
     @property
     def plates(self):
         return self.PlatesDucktype(self.root_node)
-    
+
     @property
     def structured_annotations(self):
         '''Return the structured annotations container
-        
+
         returns a wrapping of OME/StructuredAnnotations. It creates
         the element if it doesn't exist.
         '''
@@ -389,7 +392,7 @@ class OMEXML(object):
             node = ElementTree.SubElement(
                 self.root_node, qn(self.ns['sa'], "StructuredAnnotations"))
         return self.StructuredAnnotations(node)
-    
+
     class Image(object):
         '''Representation of the OME/Image element'''
         def __init__(self, node):
@@ -399,10 +402,10 @@ class OMEXML(object):
 
         def get_ID(self):
             return self.node.get("ID")
-        
+
         def set_ID(self, value):
             self.node.set("ID", value)
-            
+
         ID = property(get_ID, set_ID)
 
         def get_Name(self):
@@ -410,14 +413,14 @@ class OMEXML(object):
         def set_Name(self, value):
             self.node.set("Name", value)
         Name = property(get_Name, set_Name)
-        
+
         def get_AcquisitionDate(self):
             '''The date in ISO-8601 format'''
             acquired_date = self.node.find(qn(self.ns["ome"], "AcquisitionDate"))
             if acquired_date is None:
                 return None
             return get_text(acquired_date)
-        
+
         def set_AcquisitionDate(self, date):
             acquired_date = self.node.find(qn(self.ns["ome"], "AcquisitionDate"))
             if acquired_date is None:
@@ -426,7 +429,7 @@ class OMEXML(object):
             set_text(acquired_date, date)
         AcquisitionDate = property(get_AcquisitionDate, set_AcquisitionDate)
 
-            
+
         @property
         def Pixels(self):
             '''The OME/Image/Pixels element.
@@ -440,39 +443,39 @@ class OMEXML(object):
 
             '''
             return OMEXML.Pixels(self.node.find(qn(self.ns['ome'], "Pixels")))
-        
+
     def image(self, index=0):
         '''Return an image node by index'''
         return self.Image(self.root_node.findall(qn(self.ns['ome'], "Image"))[index])
-    
+
     class Channel(object):
         '''The OME/Image/Pixels/Channel element'''
         def __init__(self, node):
             self.node = node
             self.ns = get_namespaces(node)
- 
+
         def get_ID(self):
             return self.node.get("ID")
         def set_ID(self, value):
             self.node.set("ID", value)
         ID = property(get_ID, set_ID)
-        
+
         def get_Name(self):
             return self.node.get("Name")
         def set_Name(self, value):
             self.node.set("Name", value)
         Name = property(get_Name, set_Name)
-        
+
         def get_SamplesPerPixel(self):
             return get_int_attr(self.node, "SamplesPerPixel")
-        
+
         def set_SamplesPerPixel(self, value):
             self.node.set("SamplesPerPixel", str(value))
         SamplesPerPixel = property(get_SamplesPerPixel, set_SamplesPerPixel)
 
     class Plane(object):
         '''The OME/Image/Pixels/Plane element
-        
+
         The Plane element represents one 2-dimensional image plane. It
         has the Z, C and T indices of the plane and optionally has the
         X, Y, Z, exposure time and a relative time delta.
@@ -484,39 +487,39 @@ class OMEXML(object):
         def get_TheZ(self):
             '''The Z index of the plane'''
             return get_int_attr(self.node, "TheZ")
-        
+
         def set_TheZ(self, value):
             self.node.set("TheZ", str(value))
-            
+
         TheZ = property(get_TheZ, set_TheZ)
-        
+
         def get_TheC(self):
             '''The channel index of the plane'''
             return get_int_attr(self.node, "TheC")
-        
+
         def set_TheC(self, value):
             self.node.set("TheC", str(value))
-            
+
         TheC = property(get_TheC, set_TheC)
-        
+
         def get_TheT(self):
             '''The T index of the plane'''
             return get_int_attr(self.node, "TheT")
-        
+
         def set_TheT(self, value):
             self.node.set("TheT", str(value))
-            
+
         TheT = property(get_TheT, set_TheT)
-        
+
         def get_DeltaT(self):
             '''# of seconds since the beginning of the experiment'''
             return get_float_attr(self.node, "DeltaT")
-        
+
         def set_DeltaT(self, value):
             self.node.set("DeltaT", str(value))
-            
+
         DeltaT = property(get_DeltaT, set_DeltaT)
-        
+
         @property
         def ExposureTime(self):
             '''Units are seconds. Duration of acquisition????'''
@@ -524,40 +527,40 @@ class OMEXML(object):
             if exposure_time is not None:
                 return float(exposure_time)
             return None
-        
+
         def get_PositionX(self):
             '''X position of stage'''
             position_x = self.node.get("PositionX")
             if position_x is not None:
                 return float(position_x)
             return None
-        
+
         def set_PositionX(self, value):
             self.node.set("PositionX", str(value))
-            
+
         PositionX = property(get_PositionX, set_PositionX)
-        
+
         def get_PositionY(self):
             '''Y position of stage'''
             return get_float_attr(self.node, "PositionY")
-        
+
         def set_PositionY(self, value):
             self.node.set("PositionY", str(value))
-            
+
         PositionY = property(get_PositionY, set_PositionY)
-        
+
         def get_PositionZ(self):
             '''Z position of stage'''
             return get_float_attr(self.node, "PositionZ")
-        
+
         def set_PositionZ(self, value):
             self.node.set("PositionZ", str(value))
-            
+
         PositionZ = property(get_PositionZ, set_PositionZ)
-        
+
     class Pixels(object):
         '''The OME/Image/Pixels element
-        
+
         The Pixels element represents the pixels in an OME image and, for
         an OME-XML encoded image, will actually contain the base-64 encoded
         pixel data. It has the X, Y, Z, C, and T extents of the image
@@ -566,13 +569,13 @@ class OMEXML(object):
         def __init__(self, node):
             self.node = node
             self.ns = get_namespaces(self.node)
-            
+
         def get_ID(self):
             return self.node.get("ID")
         def set_ID(self, value):
             self.node.set("ID", value)
         ID = property(get_ID, set_ID)
-        
+
         def get_DimensionOrder(self):
             '''The ordering of image planes in the file
 
@@ -584,10 +587,10 @@ class OMEXML(object):
         def set_DimensionOrder(self, value):
             self.node.set("DimensionOrder", value)
         DimensionOrder = property(get_DimensionOrder, set_DimensionOrder)
-        
+
         def get_PixelType(self):
             '''The pixel bit type, for instance PT_UINT8
-            
+
             The pixel type specifies the datatype used to encode pixels
             in the image data. You can use the PT_* constants to compare
             and set the pixel type.
@@ -596,56 +599,56 @@ class OMEXML(object):
         def set_PixelType(self, value):
             self.node.set("Type", value)
         PixelType = property(get_PixelType, set_PixelType)
-        
+
         def get_SizeX(self):
             '''The dimensions of the image in the X direction in pixels'''
             return get_int_attr(self.node, "SizeX")
         def set_SizeX(self, value):
             self.node.set("SizeX", str(value))
         SizeX = property(get_SizeX, set_SizeX)
-        
+
         def get_SizeY(self):
             '''The dimensions of the image in the Y direction in pixels'''
             return get_int_attr(self.node, "SizeY")
         def set_SizeY(self, value):
             self.node.set("SizeY", str(value))
         SizeY = property(get_SizeY, set_SizeY)
-        
+
         def get_SizeZ(self):
             '''The dimensions of the image in the Z direction in pixels'''
             return get_int_attr(self.node, "SizeZ")
-        
+
         def set_SizeZ(self, value):
             self.node.set("SizeZ", str(value))
         SizeZ = property(get_SizeZ, set_SizeZ)
-        
+
         def get_SizeT(self):
             '''The dimensions of the image in the T direction in pixels'''
             return get_int_attr(self.node, "SizeT")
-        
+
         def set_SizeT(self, value):
             self.node.set("SizeT", str(value))
         SizeT = property(get_SizeT, set_SizeT)
-        
+
         def get_SizeC(self):
             '''The dimensions of the image in the C direction in pixels'''
             return get_int_attr(self.node, "SizeC")
         def set_SizeC(self, value):
             self.node.set("SizeC", str(value))
         SizeC = property(get_SizeC, set_SizeC)
-        
+
         def get_channel_count(self):
             '''The number of channels in the image
-            
+
             You can change the number of channels in the image by
             setting the channel_count:
-            
+
             pixels.channel_count = 3
             pixels.Channel(0).Name = "Red"
             ...
             '''
             return len(self.node.findall(qn(self.ns['ome'], "Channel")))
-        
+
         def set_channel_count(self, value):
             assert value > 0
             channel_count = self.channel_count
@@ -660,29 +663,29 @@ class OMEXML(object):
                     new_channel.ID = str(uuid.uuid4())
                     new_channel.Name = new_channel.ID
                     new_channel.SamplesPerPixel = 1
-                
+
         channel_count = property(get_channel_count, set_channel_count)
-        
+
         def Channel(self, index=0):
             '''Get the indexed channel from the Pixels element'''
             channel = self.node.findall(qn(self.ns['ome'], "Channel"))[index]
             return OMEXML.Channel(channel)
-    
+
         def get_plane_count(self):
             '''The number of planes in the image
-            
+
             An image with only one plane or an interleaved color plane will
             often not have any planes.
-            
+
             You can change the number of planes in the image by
             setting the plane_count:
-            
+
             pixels.plane_count = 3
             pixels.Plane(0).TheZ=pixels.Plane(0).TheC=pixels.Plane(0).TheT=0
             ...
             '''
             return len(self.node.findall(qn(self.ns['ome'], "Plane")))
-        
+
         def set_plane_count(self, value):
             assert value >= 0
             plane_count = self.plane_count
@@ -694,61 +697,61 @@ class OMEXML(object):
                 for _ in range(plane_count, value):
                     new_plane = OMEXML.Plane(
                         ElementTree.SubElement(self.node, qn(self.ns['ome'], "Plane")))
-                
+
         plane_count = property(get_plane_count, set_plane_count)
-        
+
         def Plane(self, index=0):
             '''Get the indexed plane from the Pixels element'''
             plane = self.node.findall(qn(self.ns['ome'], "Plane"))[index]
             return OMEXML.Plane(plane)
-        
+
     class StructuredAnnotations(dict):
         '''The OME/StructuredAnnotations element
-        
+
         Structured annotations let OME-XML represent metadata from other file
         formats, for example the tag metadata in TIFF files. The
         StructuredAnnotations element is a container for the structured
         annotations.
-        
+
         Images can have structured annotation references. These match to
         the IDs of structured annotations in the StructuredAnnotations
         element. You can get the structured annotations in an OME-XML document
         using a dictionary interface to StructuredAnnotations.
-        
+
         Pragmatically, TIFF tag metadata is stored as key/value pairs in
         OriginalMetadata annotations - in the context of CellProfiler,
         callers will be using these to read tag data that's not represented
         in OME-XML such as the bits per sample and min and max sample values.
-        
+
         '''
-        
+
         def __init__(self, node):
             self.node = node
             self.ns = get_namespaces(self.node)
-       
+
         def __getitem__(self, key):
             for child in self.node:
                 if child.get("ID") == key:
                     return child
             raise IndexError('ID "%s" not found' % key)
-        
+
         def keys(self):
             return filter(lambda x: x is not None,
                           [child.get("ID") for child in self.node])
-        
+
         def has_key(self, key):
             for child in self.node:
                 if child.get("ID") == key:
                     return True
             return False
-        
+
         def add_original_metadata(self, key, value):
             '''Create an original data key/value pair
-            
+
             key - the original metadata's key name, for instance OM_PHOTOMETRIC_INTERPRETATION
-            
+
             value - the value, for instance, "RGB"
-            
+
             returns the ID for the structured annotation.
             '''
             xml_annotation = ElementTree.SubElement(
@@ -767,12 +770,12 @@ class OMEXML(object):
 
         def iter_original_metadata(self):
             '''An iterator over the original metadata in structured annotations
-            
+
             returns (<annotation ID>, (<key, value>))
-            
+
             where <annotation ID> is the ID attribute of the annotation (which
             can be used to tie an annotation to an image)
-            
+
                   <key> is the original metadata key, typically one of the
                   OM_* names of a TIFF tag
                   <value> is the value for the metadata
@@ -809,16 +812,16 @@ class OMEXML(object):
                             else:
                                 logger.warn("Original metadata was missing key or value:" + om_node.toxml())
             return
-                    
+
         def has_original_metadata(self, key):
             '''True if there is an original metadata item with the given key'''
-            return any([k == key 
-                        for annotation_id, (k, v) 
+            return any([k == key
+                        for annotation_id, (k, v)
                         in self.iter_original_metadata()])
-        
+
         def get_original_metadata_value(self, key, default=None):
             '''Return the value for a particular original metadata key
-            
+
             key - key to search for
             default - default value to return if not found
             '''
@@ -826,12 +829,12 @@ class OMEXML(object):
                 if k == key:
                     return v
             return default
-            
+
         def get_original_metadata_refs(self, ids):
             '''For a given ID, get the matching original metadata references
-            
+
             ids - collection of IDs to match
-            
+
             returns a dictionary of key to value
             '''
             d = {}
@@ -839,39 +842,39 @@ class OMEXML(object):
                 if annotation_id in ids:
                     d[k] = v
             return d
-        
+
         @property
         def OriginalMetadata(self):
             return OMEXML.OriginalMetadata(self)
-    
+
     class OriginalMetadata(dict):
         '''View original metadata as a dictionary
-        
+
         Original metadata holds "vendor-specific" metadata including TIFF
         tag values.
         '''
         def __init__(self, sa):
             '''Initialized with the structured_annotations class instance'''
             self.sa = sa
-            
+
         def __getitem__(self, key):
             return self.sa.get_original_metadata_value(key)
-        
+
         def __setitem__(self, key, value):
             self.sa.add_original_metadata(key, value)
-            
+
         def __iter__(self):
             for annotation_id, (key, value) in self.sa.iter_original_metadata():
                 yield key
-                
+
         def __len__(self):
             return len(list(self.sa_iter_original_metadata()))
-        
+
         def keys(self):
-            return [key 
-                    for annotation_id, (key, value) 
+            return [key
+                    for annotation_id, (key, value)
                     in self.sa.iter_original_metadata()]
-            
+
         def has_key(self, key):
             for annotation_id, (k, value) in self.sa.iter_original_metadata():
                 if k == key:
@@ -881,7 +884,7 @@ class OMEXML(object):
         def iteritems(self):
             for annotation_id, (key, value) in self.sa.iter_original_metadata():
                 yield key, value
-                
+
     class PlatesDucktype(object):
         '''It looks like a list of plates'''
         def __init__(self, root):
@@ -893,14 +896,14 @@ class OMEXML(object):
             if isinstance(key, slice):
                 return [OMEXML.Plate(plate) for plate in plates[key]]
             return OMEXML.Plate(plates[key])
-        
+
         def __len__(self):
             return len(self.root.findall(qn(self.ns['spw'], "Plate")))
-        
+
         def __iter__(self):
             for plate in self.root.iterfind(qn(self.ns['spw'], "Plate")):
                 yield OMEXML.Plate(plate)
-                
+
         def newPlate(self, name, plate_id = str(uuid.uuid4())):
             new_plate_node = ElementTree.SubElement(
                 self.root, qn(self.ns['spw'], "Plate"))
@@ -908,114 +911,114 @@ class OMEXML(object):
             new_plate.ID = plate_id
             new_plate.Name = name
             return new_plate
-        
+
     class Plate(object):
         '''The SPW:Plate element
-        
+
         This represents the plate element of the SPW schema:
         http://www.openmicroscopy.org/Schemas/SPW/2007-06/
         '''
         def __init__(self, node):
             self.node = node
             self.ns = get_namespaces(self.node)
-            
+
         def get_ID(self):
             return self.node.get("ID")
-        
+
         def set_ID(self, value):
             self.node.set("ID", value)
-            
+
         ID = property(get_ID, set_ID)
-        
+
         def get_Name(self):
             return self.node.get("Name")
-        
+
         def set_Name(self, value):
             self.node.set("Name", value)
-            
+
         Name = property(get_Name, set_Name)
-        
+
         def get_Status(self):
             return self.node.get("Status")
-        
+
         def set_Status(self, value):
             self.node.set("Status", value)
-            
+
         Status = property(get_Status, set_Status)
-        
+
         def get_ExternalIdentifier(self):
             return self.node.get("ExternalIdentifier")
-        
+
         def set_ExternalIdentifier(self, value):
             return self.node.set("ExternalIdentifier", value)
-        
+
         ExternalIdentifier = property(get_ExternalIdentifier, set_ExternalIdentifier)
-        
+
         def get_ColumnNamingConvention(self):
             # Consider a default if not defined of NC_NUMBER
             return self.node.get("ColumnNamingConvention")
-        
+
         def set_ColumnNamingConvention(self, value):
             assert value in (NC_LETTER, NC_NUMBER)
             self.node.set("ColumnNamingConvention", value)
-        ColumnNamingConvention = property(get_ColumnNamingConvention, 
+        ColumnNamingConvention = property(get_ColumnNamingConvention,
                                           set_ColumnNamingConvention)
-            
+
         def get_RowNamingConvention(self):
             # Consider a default if not defined of NC_LETTER
             return self.node.get("RowNamingConvention")
-        
+
         def set_RowNamingConvention(self, value):
             assert value in (NC_LETTER, NC_NUMBER)
             self.node.set("RowNamingConvention", value)
         RowNamingConvention = property(get_RowNamingConvention,
                                        set_RowNamingConvention)
-        
+
         def get_WellOriginX(self):
             return get_float_attr(self.node, "WellOriginX")
-        
+
         def set_WellOriginX(self, value):
             self.node.set("WellOriginX", str(value))
         WellOriginX = property(get_WellOriginX, set_WellOriginX)
-        
+
         def get_WellOriginY(self):
             return get_float_attr(self.node, "WellOriginY")
-        
+
         def set_WellOriginY(self, value):
             self.node.set("WellOriginY", str(value))
         WellOriginY = property(get_WellOriginY, set_WellOriginY)
-        
+
         def get_Rows(self):
             return get_int_attr(self.node, "Rows")
-        
+
         def set_Rows(self, value):
             self.node.set("Rows", str(value))
-            
+
         Rows = property(get_Rows, set_Rows)
-        
+
         def get_Columns(self):
             return get_int_attr(self.node, "Columns")
-        
+
         def set_Columns(self, value):
             self.node.set("Columns", str(value))
-            
+
         Columns = property(get_Columns, set_Columns)
-        
+
         def get_Description(self):
             description = self.node.find(qn(self.ns['spw'], "Description"))
             if description is None:
                 return None
             return get_text(description)
-        
+
         def set_Description(self, text):
             make_text_node(self.node, NS_SPW, "Description", test)
         Description = property(get_Description, set_Description)
-        
+
         def get_Well(self):
             '''The well dictionary / list'''
             return OMEXML.WellsDucktype(self)
         Well = property(get_Well)
-        
+
         def get_well_name(self, well):
             '''Get a well's name, using the row and column convention'''
             result = "".join([
@@ -1025,13 +1028,13 @@ class OMEXML(object):
                 in ((well.Row, self.RowNamingConvention or NC_LETTER),
                     (well.Column, self.ColumnNamingConvention or NC_NUMBER))])
             return result
-        
+
     class WellsDucktype(dict):
         '''The WellsDucktype lets you retrieve and create wells
-        
+
         The WellsDucktype looks like a dictionary but lets you reference
         the wells in a plate using indexing. Types of indexes:
-        
+
         list indexing: e.g. plate.Well[14] gets the 14th well as it appears
                        in the XML
         dictionary_indexing:
@@ -1045,10 +1048,10 @@ class OMEXML(object):
             self.plate_node = plate.node
             self.plate = plate
             self.ns = get_namespaces(self.plate_node)
-            
+
         def __len__(self):
             return len(self.plate_node.findall(qn(self.ns['spw'], "Well")))
-        
+
         def __getitem__(self, key):
             all_wells = self.plate_node.findall(qn(self.ns['spw'], "Well"))
             if isinstance(key, slice):
@@ -1069,10 +1072,10 @@ class OMEXML(object):
                 if well.ID == key:
                     return well
             return None
-        
+
         def __iter__(self):
             '''Return the standard name for all wells on the plate
-            
+
             for instance, 'B03' for a well with Row=1, Column=2 for a plate
             with the standard row and column naming convention
             '''
@@ -1081,10 +1084,10 @@ class OMEXML(object):
             for w in all_wells:
                 well.node = w
                 yield self.plate.get_well_name(well)
-                
+
         def new(self, row, column, well_id = str(uuid.uuid4())):
             '''Create a new well at the given row and column
-            
+
             row - index of well's row
             column - index of well's column
             well_id - the ID attribute for the well
@@ -1096,58 +1099,58 @@ class OMEXML(object):
             well.Column = column
             well.ID = well_id
             return well
-            
+
     class Well(object):
         def __init__(self, node):
             self.node = node
-            
+
         def get_Column(self):
             return get_int_attr(self.node, "Column")
         def set_Column(self, value):
             self.node.set("Column", str(value))
         Column = property(get_Column, set_Column)
-        
+
         def get_Row(self):
             return get_int_attr(self.node, "Row")
         def set_Row(self, value):
             self.node.set("Row", str(value))
         Row = property(get_Row, set_Row)
-        
+
         def get_ID(self):
             return self.node.get("ID")
         def set_ID(self, value):
             self.node.set("ID", value)
         ID = property(get_ID, set_ID)
-        
+
         def get_Sample(self):
             return OMEXML.WellSampleDucktype(self.node)
         Sample = property(get_Sample)
-        
+
         def get_ExternalDescription(self):
             return self.node.get("ExternalDescription")
-        
+
         def set_ExternalDescription(self, value):
             return self.node.set("ExternalDescription", value)
-        
+
         ExternalDescription = property(get_ExternalDescription, set_ExternalDescription)
-        
+
         def get_ExternalIdentifier(self):
             return self.node.get("ExternalIdentifier")
-        
+
         def set_ExternalIdentifier(self, value):
             return self.node.set("ExternalIdentifier", value)
-        
+
         ExternalIdentifier = property(get_ExternalIdentifier, set_ExternalIdentifier)
-        
+
         def get_Color(self):
             return int(self.node.get("Color"))
-        
+
         def set_Color(self, value):
             self.node.set("Color", str(value))
-        
+
     class WellSampleDucktype(list):
         '''The WellSample elements in a well
-        
+
         This is made to look like an indexable list so that you can do
         things like:
         wellsamples[0:2]
@@ -1155,23 +1158,23 @@ class OMEXML(object):
         def __init__(self, well_node):
             self.well_node = well_node
             self.ns = get_namespaces(self.well_node)
-            
+
         def __len__(self):
             return len(self.well_node.findall(qn(self.ns['spw'], "WellSample")))
-        
+
         def __getitem__(self, key):
             all_samples = self.well_node.findall(qn(self.ns['spw'], "WellSample"))
             if isinstance(key, slice):
-                return [OMEXML.WellSample(s) 
+                return [OMEXML.WellSample(s)
                         for s in all_samples[key]]
             return OMEXML.WellSample(all_samples[int(key)])
-        
+
         def __iter__(self):
             '''Iterate through the well samples.'''
             all_samples = self.well_node.findall(qn(self.ns['spw'], "WellSample"))
             for s in all_samples:
                 yield OMEXML.WellSample(s)
-                
+
         def new(self, wellsample_id = str(uuid.uuid4()), index = None):
             '''Create a new well sample
             '''
@@ -1182,13 +1185,13 @@ class OMEXML(object):
             s = OMEXML.WellSample(new_node)
             s.ID = wellsample_id
             s.Index = index
-        
+
     class WellSample(object):
         '''The WellSample is a location within a well'''
         def __init__(self, node):
             self.node = node
             self.ns = get_namespaces(self.node)
-            
+
         def get_ID(self):
             return self.node.get("ID")
         def set_ID(self, value):
@@ -1200,38 +1203,38 @@ class OMEXML(object):
         def set_PositionX(self, value):
             self.node.set("PositionX", str(value))
         PositionX = property(get_PositionX, set_PositionX)
-        
+
         def get_PositionY(self):
             return get_float_attr(self.node, "PositionY")
 
         def set_PositionY(self, value):
             self.node.set("PositionY", str(value))
         PositionY = property(get_PositionY, set_PositionY)
-        
+
         def get_Timepoint(self):
             return self.node.get("Timepoint")
-        
+
         def set_Timepoint(self, value):
             if isinstance(value, datetime.datetime):
                 value = value.isoformat()
             self.node.set("Timepoint", value)
         Timepoint = property(get_Timepoint, set_Timepoint)
-        
+
         def get_Index(self):
             return get_int_attr(self.node, "Index")
 
         def set_Index(self, value):
             self.node.set("Index", str(value))
-            
+
         Index = property(get_Index, set_Index)
-        
+
         def get_ImageRef(self):
             '''Get the ID of the image of this site'''
             ref = self.node.find(qn(self.ns['spw'], "ImageRef"))
             if ref is None:
                 return None
             return ref.get("ID")
-        
+
         def set_ImageRef(self, value):
             '''Add a reference to the image of this site'''
             ref = self.node.find(qn(self.ns['spw'], "ImageRef"))
@@ -1239,4 +1242,4 @@ class OMEXML(object):
                 ref = ElementTree.SubElement(self.node, qn(self.ns['spw'], "ImageRef"))
             ref.set("ID", value)
         ImageRef = property(get_ImageRef, set_ImageRef)
-        
+

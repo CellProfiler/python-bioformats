@@ -1,9 +1,11 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
+
+from __future__ import absolute_import, print_function, unicode_literals
 
 import exceptions
 import os
@@ -22,7 +24,7 @@ class TestLoadUsingBioformats(unittest.TestCase):
     def setUp(self):
         javabridge.attach()
         bioformats.init_logger()
-        
+
     def tearDown(self):
         javabridge.detach()
 
@@ -30,19 +32,19 @@ class TestLoadUsingBioformats(unittest.TestCase):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
         image, scale = load_image(path, rescale=False,
                                   wants_max_intensity=True)
-        print image.shape
-        
+        print(image.shape)
+
     def test_file_not_found(self):
         # Regression test of issue #6
         path = os.path.join(os.path.dirname(__file__), 'Channel5-01-A-01.tif')
-        self.assertRaises(exceptions.IOError, 
+        self.assertRaises(exceptions.IOError,
                           lambda :load_image(path))
 
 class TestLoadUsingBioformatsURL(unittest.TestCase):
     def setUp(self):
         javabridge.attach()
         bioformats.init_logger()
-        
+
     def tearDown(self):
         javabridge.detach()
 
@@ -52,7 +54,7 @@ class TestLoadUsingBioformatsURL(unittest.TestCase):
         image, scale = load_image_url(
             url, rescale=False, wants_max_intensity=True)
         self.assertEqual(image.shape[0], 640)
-        
+
     def test_01_02_open_http(self):
         url = "https://github.com/CellProfiler/python-bioformats"+\
             "/raw/master/bioformats/tests/Channel1-01-A-01.tif"
@@ -66,9 +68,9 @@ class TestLoadUsingBioformatsURL(unittest.TestCase):
         # raise an exception when converting URL to string
         #
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
-        url = u"file:" + urllib.pathname2url(path).encode("utf-8")
+        url = "file:" + urllib.pathname2url(path).encode("utf-8")
         image, scale = load_image_url(
             url, rescale=False, wants_max_intensity=True)
         self.assertEqual(image.shape[0], 640)
-        
-    
+
+
