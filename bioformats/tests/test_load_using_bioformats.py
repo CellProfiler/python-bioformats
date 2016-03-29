@@ -16,7 +16,12 @@ import bioformats
 import bioformats.formatreader as formatreader
 import bioformats.metadatatools as metadatatools
 from bioformats import load_image, load_image_url
-import urllib
+
+import sys
+if sys.version_info.major == 3:
+    from urllib.request import pathname2url
+else:
+    from urllib import pathname2url
 
 class TestLoadUsingBioformats(unittest.TestCase):
 
@@ -48,7 +53,7 @@ class TestLoadUsingBioformatsURL(unittest.TestCase):
 
     def test_01_01_open_file(self):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
-        url = "file:" + urllib.pathname2url(path).encode("utf-8")
+        url = "file:" + pathname2url(path).encode("utf-8")
         image, scale = load_image_url(
             url, rescale=False, wants_max_intensity=True)
         self.assertEqual(image.shape[0], 640)
@@ -66,7 +71,7 @@ class TestLoadUsingBioformatsURL(unittest.TestCase):
         # raise an exception when converting URL to string
         #
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
-        url = "file:" + urllib.pathname2url(path).encode("utf-8")
+        url = "file:" + pathname2url(path).encode("utf-8")
         image, scale = load_image_url(
             url, rescale=False, wants_max_intensity=True)
         self.assertEqual(image.shape[0], 640)

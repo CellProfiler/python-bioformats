@@ -32,8 +32,15 @@ import errno
 import numpy as np
 import os
 import sys
-import urllib
-import urllib2
+
+if sys.version_info.major == 3:
+    from urllib.request import urlopen, urlparse, url2pathname
+    from urllib.parse import unquote
+else:
+    from urllib import url2pathname
+    from urllib2 import urlopen, urlparse, unquote
+    urlparse = urlparse.urlparse
+
 import shutil
 import tempfile
 import traceback
@@ -546,7 +553,7 @@ class ImageReader(object):
         self.url = url
         self.using_temp_file = False
         if url is not None and url.lower().startswith(file_scheme):
-            utf8_url = urllib.url2pathname(url[len(file_scheme):])
+            utf8_url = url2pathname(url[len(file_scheme):])
             if isinstance(utf8_url, str):
                 path = str(utf8_url, 'utf-8')
             else:
@@ -593,7 +600,7 @@ class ImageReader(object):
                 # Other URLS, copy them to a tempfile location
                 #
                 ext = url[url.rfind("."):]
-                src = urllib2.urlopen(url)
+                src = urlopen(url)
                 dest_fd, self.path = tempfile.mkstemp(suffix=ext)
                 try:
                     dest = os.fdopen(dest_fd, 'wb')
@@ -605,8 +612,8 @@ class ImageReader(object):
                 self.using_temp_file = True
                 src.close()
                 dest.close()
-                urlpath = urllib2.urlparse.urlparse(url)[2]
-                filename = urllib2.unquote(urlpath.split("/")[-1])
+                urlpath = urlparse(url)[2]
+                filename = unquote(urlpath.split("/")[-1])
         else:
             if sys.platform.startswith("win"):
                 self.path = self.path.replace("/", os.path.sep)
