@@ -743,6 +743,9 @@ class OMEXML(object):
                     return child
             raise IndexError('ID "%s" not found' % key)
 
+        def __contains__(self, key):
+            return self.has_key(key)
+
         def keys(self):
             return filter(lambda x: x is not None,
                           [child.get("ID") for child in self.node])
@@ -870,6 +873,9 @@ class OMEXML(object):
 
         def __setitem__(self, key, value):
             self.sa.add_original_metadata(key, value)
+
+        def __contains__(self, key):
+            return self.has_key(key)
 
         def __iter__(self):
             for annotation_id, (key, value) in self.sa.iter_original_metadata():
