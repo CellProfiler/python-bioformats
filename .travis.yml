@@ -1,6 +1,7 @@
 language: java
 env:
    - PYTHON_VERSION="2.7"
+   - PYTHON_VERSION="3.5"
 before_install:
    # Get the tag if it wasn't provided. Travis doesn't provide this if it isn't a tagged build.
    - if [ -z $TRAVIS_TAG ]; then TRAVIS_TAG=`git tag --contains` ; fi
