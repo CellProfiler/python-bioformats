@@ -550,14 +550,14 @@ class ImageReader(object):
     def __init__(self, path=None, url=None, perform_init=True):
         self.stream = None
         file_scheme = "file:"
-        self.url = url
         self.using_temp_file = False
-        if url is not None and url.lower().startswith(file_scheme):
-            utf8_url = url2pathname(url[len(file_scheme):])
-            if isinstance(utf8_url, str):
-                path = str(utf8_url, 'utf-8')
-            else:
-                path = utf8_url
+
+        if url is not None:
+            url = str(url)
+            if url.lower().startswith(file_scheme):
+                url = url2pathname(url[len(file_scheme):])
+                path = url
+
         self.path = path
         if path is None:
             if url.lower().startswith("omero:"):
