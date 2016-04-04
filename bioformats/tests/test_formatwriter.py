@@ -1,13 +1,15 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
 '''test_formatwriter.py - test the Bioformats format reader wrapper
 
 '''
+
+from __future__ import absolute_import, unicode_literals
 
 import numpy as np
 import os
@@ -22,18 +24,18 @@ class TestFormatWriter(unittest.TestCase):
     def setUp(self):
         self.path = tempfile.mkdtemp()
         self.files = []
-        
+
     def get_tempfilename(self, suffix):
         fd, name = tempfile.mkstemp(suffix, self.path)
         self.files.append(name)
         os.close(fd)
         return name
-        
+
     def tearDown(self):
         for filename in self.files:
             os.remove(filename)
         os.rmdir(self.path)
-        
+
     def test_01_01_write_monochrome_8_bit_tif(self):
         r = np.random.RandomState()
         r.seed(101)
@@ -42,7 +44,7 @@ class TestFormatWriter(unittest.TestCase):
         W.write_image(path, img, OME.PT_UINT8)
         result = load_using_bioformats(path, rescale=False)
         np.testing.assert_array_equal(img, result)
-        
+
     def test_01_02_write_monchrome_16_bit__tiff(self):
         r = np.random.RandomState()
         r.seed(102)
@@ -51,7 +53,7 @@ class TestFormatWriter(unittest.TestCase):
         W.write_image(path, img, OME.PT_UINT16)
         result = load_using_bioformats(path, rescale=False)
         np.testing.assert_array_equal(img, result)
-        
+
     def test_01_03_write_color_tiff(self):
         r = np.random.RandomState()
         r.seed(103)
@@ -60,7 +62,7 @@ class TestFormatWriter(unittest.TestCase):
         W.write_image(path, img, OME.PT_UINT8)
         result = load_using_bioformats(path, rescale = False)
         np.testing.assert_array_equal(img, result)
-        
+
     def test_02_01_write_movie(self):
         r = np.random.RandomState()
         r.seed(103)
@@ -71,4 +73,4 @@ class TestFormatWriter(unittest.TestCase):
         for i in range(img.shape[0]):
             result = load_using_bioformats(path, t=i, rescale = False)
             np.testing.assert_array_equal(img[i], result)
-        
+

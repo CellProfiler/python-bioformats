@@ -1,13 +1,15 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
 '''Bioformats package - wrapper for loci.bioformats java code
 
 '''
+
+from __future__ import absolute_import, unicode_literals
 
 try:
     from _version import __version__
@@ -30,18 +32,18 @@ JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'
 to the Java virtual machine's class path."""
 
 # See http://www.loci.wisc.edu/software/bio-formats
-READABLE_FORMATS = ('al3d', 'am', 'amiramesh', 'apl', 'arf', 'avi', 'bmp', 
-                    'c01', 'cfg', 'cxd', 'dat', 'dcm', 'dicom', 'dm3', 'dv', 
-                    'eps', 'epsi', 'fits', 'flex', 'fli', 'gel', 'gif', 'grey', 
-                    'hdr', 'html', 'hx', 'ics', 'ids', 'img', 'ims', 'ipl', 
-                    'ipm', 'ipw', 'jp2', 'jpeg', 'jpg', 'l2d', 'labels', 'lei', 
-                    'lif', 'liff', 'lim', 'lsm', 'mdb', 'mnc', 'mng', 'mov', 
-                    'mrc', 'mrw', 'mtb', 'naf', 'nd', 'nd2', 'nef', 'nhdr', 
-                    'nrrd', 'obsep', 'oib', 'oif', 'ome', 'ome.tiff', 'pcx', 
-                    'pgm', 'pic', 'pict', 'png', 'ps', 'psd', 'r3d', 'raw', 
-                    'scn', 'sdt', 'seq', 'sld', 'stk', 'svs', 'tif', 'tiff', 
+READABLE_FORMATS = ('al3d', 'am', 'amiramesh', 'apl', 'arf', 'avi', 'bmp',
+                    'c01', 'cfg', 'cxd', 'dat', 'dcm', 'dicom', 'dm3', 'dv',
+                    'eps', 'epsi', 'fits', 'flex', 'fli', 'gel', 'gif', 'grey',
+                    'hdr', 'html', 'hx', 'ics', 'ids', 'img', 'ims', 'ipl',
+                    'ipm', 'ipw', 'jp2', 'jpeg', 'jpg', 'l2d', 'labels', 'lei',
+                    'lif', 'liff', 'lim', 'lsm', 'mdb', 'mnc', 'mng', 'mov',
+                    'mrc', 'mrw', 'mtb', 'naf', 'nd', 'nd2', 'nef', 'nhdr',
+                    'nrrd', 'obsep', 'oib', 'oif', 'ome', 'ome.tiff', 'pcx',
+                    'pgm', 'pic', 'pict', 'png', 'ps', 'psd', 'r3d', 'raw',
+                    'scn', 'sdt', 'seq', 'sld', 'stk', 'svs', 'tif', 'tiff',
                     'tnb', 'txt', 'vws', 'xdce', 'xml', 'xv', 'xys', 'zvi')
-WRITABLE_FORMATS = ('avi', 'eps', 'epsi', 'ics', 'ids', 'jp2', 'jpeg', 'jpg', 
+WRITABLE_FORMATS = ('avi', 'eps', 'epsi', 'ics', 'ids', 'jp2', 'jpeg', 'jpg',
                     'mov', 'ome', 'ome.tiff', 'png', 'ps', 'tif', 'tiff')
 
 OMETiffWriter = _formatwriter.make_ome_tiff_writer_class()
@@ -51,7 +53,7 @@ ChannelSeparator = _formatreader.make_reader_wrapper_class(
 
 from .metadatatools import createOMEXMLMetadata as create_ome_xml_metadata
 from .metadatatools import wrap_imetadata_object
-import metadatatools as _metadatatools
+from . import metadatatools as _metadatatools
 PixelType = _metadatatools.make_pixel_type_class()
 get_metadata_options = _metadatatools.get_metadata_options
 
@@ -101,6 +103,6 @@ def init_logger():
 if __name__ == "__main__":
     # Handy-dandy PyShell for exploring BioFormats / Rhino / ImageJ
     import wx.py.PyCrust
-    
+
     wx.py.PyCrust.main()
     J.kill_vm()
