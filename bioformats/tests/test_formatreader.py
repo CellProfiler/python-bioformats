@@ -1,7 +1,7 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
@@ -9,10 +9,16 @@
 
 '''
 
+from __future__ import absolute_import, unicode_literals
+
 import numpy as np
 import os
 import re
-import urllib
+import sys
+if sys.version_info.major == 2:
+    from urllib import urlopen
+else:
+    from urllib.request import urlopen
 import unittest
 
 import javabridge as J
@@ -24,10 +30,10 @@ class TestFormatReader(unittest.TestCase):
         J.start_vm(class_path=bioformats.JARS)
         J.attach()
         bioformats.init_logger()
-        
+
     def tearDown(self):
         J.detach()
-        
+
     def test_01_01_make_format_tools_class(self):
         FormatTools = F.make_format_tools_class()
         self.assertEqual(FormatTools.CAN_GROUP, 1)
@@ -57,7 +63,7 @@ class TestFormatReader(unittest.TestCase):
         self.assertEqual(reader.getSizeZ(), 1)
         self.assertEqual(reader.getPixelType(), FormatTools.UINT8)
         self.assertEqual(reader.getRGBChannelCount(), 1)
-        
+
     def test_03_01_read_tif(self):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
         ImageReader = F.make_image_reader_class()
@@ -93,7 +99,7 @@ class TestFormatReader(unittest.TestCase):
              [5, 2, 3, 3, 2, 2, 2, 3, 2, 2]], dtype=np.uint8)
         self.assertTrue(np.all(expected_0_10_0_10 == data[:10,:10]))
         self.assertTrue(np.all(expected_n10_n10 == data[-10:,-10:]))
-        
+
     def test_03_02_load_using_bioformats(self):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
         data = F.load_using_bioformats(path, rescale=False)
@@ -158,22 +164,21 @@ class TestFormatReader(unittest.TestCase):
     def test_03_03_load_using_bioformats_url(self):
         url = "https://github.com/CellProfiler/python-bioformats/raw/1.0.5/bioformats/tests/Channel1-01-A-01.tif"
         try:
-            fd = urllib.urlopen(url)
+            fd = urlopen(url)
             if fd.code < 200 or fd.code >= 300:
-                raise IOError("Http error %d" % fd.code)
-        except IOError, e:
+                raise OSError("Http error %d" % fd.code)
+        except OSError as e:
             def bad_url(e=e):
-                print "bad url"
                 raise e
             unittest.expectedFailure(bad_url)()
         
         data = F.load_using_bioformats_url(url, rescale=False)
         self.assertSequenceEqual(data.shape, (640, 640))
-        
+
     def test_04_01_read_omexml_metadata(self):
         path = os.path.join(os.path.dirname(__file__), 'Channel1-01-A-01.tif')
         xml = F.get_omexml_metadata(path)
         pattern = r'<\s*Image\s+ID\s*=\s*"Image:0"\s+Name\s*=\s*"Channel1-01-A-01.tif"\s*>'
         self.assertTrue(re.search(pattern, xml))
-       
-        
+
+

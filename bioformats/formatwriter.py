@@ -1,7 +1,7 @@
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
-# 
+#
 # Copyright (c) 2009-2014 Broad Institute
 # All rights reserved.
 
@@ -30,6 +30,8 @@ file.
 
 '''
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 __version__ = "$Revision$"
 
 import numpy as np
@@ -41,30 +43,30 @@ import bioformats
 import javabridge as javabridge
 import bioformats.omexml as ome
 
-def write_image(pathname, pixels, pixel_type, 
+def write_image(pathname, pixels, pixel_type,
                 c = 0, z = 0, t = 0,
                 size_c = 1, size_z = 1, size_t = 1,
                 channel_names = None):
     """Write the image using bioformats.
-    
+
     :param filename: save to this filename
-        
+
     :param pixels: the image to save
-        
+
     :param pixel_type: save using this pixel type
-        
+
     :param c: the image's channel index
-        
+
     :param z: the image's `z` index
-        
+
     :param t: the image's `t` index
-        
+
     :param size_c: # of channels in the stack
-        
+
     :param size_z: # of z stacks
-        
+
     :param size_t: # of timepoints in the stack
-        
+
     :param channel_names: names of the channels (make up names if not present).
 
     """
@@ -108,14 +110,14 @@ def write_image(pathname, pixels, pixel_type,
                           xml=xml,
                           index=index,
                           buffer=pixel_buffer))
-    
+
 def convert_pixels_to_buffer(pixels, pixel_type):
     '''Convert the pixels in the image into a buffer of the right pixel type
-    
+
     pixels - a 2d monochrome or color image
-    
+
     pixel_type - one of the OME pixel types
-    
+
     returns a 1-d byte array
     '''
     if pixel_type in (ome.PT_UINT8, ome.PT_INT8, ome.PT_BIT):
@@ -133,17 +135,17 @@ def convert_pixels_to_buffer(pixels, pixel_type):
     buf = np.frombuffer(np.ascontiguousarray(pixels, as_dtype).data, np.uint8)
     env = jutil.get_env()
     return env.make_byte_array(buf)
-        
+
 def make_iformat_writer_class(class_name):
     '''Bind a Java class that implements IFormatWriter to a Python class
-    
+
     Returns a class that implements IFormatWriter through calls to the
     implemented class passed in. The returned class can be subclassed to
     provide additional bindings.
     '''
     class IFormatWriter(object):
         '''A wrapper for loci.formats.IFormatWriter
-        
+
         See http://hudson.openmicroscopy.org.uk/job/LOCI/javadoc/loci/formats/ImageWriter.html
         '''
         canDoStacks = jutil.make_method('canDoStacks', '()Z',
@@ -154,37 +156,37 @@ def make_iformat_writer_class(class_name):
                                            'Gets the current compression type.')
         getCompressionTypes = jutil.make_method('getCompressionTypes', '()[Ljava/lang/String;',
                                                 'Gets the available compression types.')
-        getFramesPerSecond = jutil.make_method('getFramesPerSecond', '()I', 
+        getFramesPerSecond = jutil.make_method('getFramesPerSecond', '()I',
                                                'Gets the frames per second to use when writing.')
         getMetadataRetrieve = jutil.make_method('getMetadataRetrieve', '()Lloci/formats/meta/MetadataRetrieve;',
                                                 'Retrieves the current metadata retrieval object for this writer.')
-        getPixelTypes = jutil.make_method('getPixelTypes', '()[I', 
+        getPixelTypes = jutil.make_method('getPixelTypes', '()[I',
                                           'Gets the supported pixel types.')
-#        getPixelTypes = jutil.make_method('getPixelTypes', '(Ljava/lang/String;)[I', 
+#        getPixelTypes = jutil.make_method('getPixelTypes', '(Ljava/lang/String;)[I',
 #                                          'Gets the supported pixel types for the given codec.')
-        isInterleaved = jutil.make_method('isInterleaved', '()Z', 
+        isInterleaved = jutil.make_method('isInterleaved', '()Z',
                                           'Gets whether or not the channels in an image are interleaved.')
-        isSupportedType = jutil.make_method('isSupportedType', '(I)Z', 
+        isSupportedType = jutil.make_method('isSupportedType', '(I)Z',
                                             'Checks if the given pixel type is supported.')
-        saveBytes = jutil.make_method('saveBytes', '([BZ)V', 
+        saveBytes = jutil.make_method('saveBytes', '([BZ)V',
                                       'Saves the given byte array to the current file.')
         saveBytesIB = jutil.make_method('saveBytes', '(I[B)V',
                                         'Saves bytes, first arg is image #')
-#        saveBytes = jutil.make_method('saveBytes', '([BIZZ)V', 
+#        saveBytes = jutil.make_method('saveBytes', '([BIZZ)V',
 #                                      'Saves the given byte array to the given series in the current file.')
-        savePlane = jutil.make_method('savePlane', '(Ljava/lang/Object;Z)V', 
+        savePlane = jutil.make_method('savePlane', '(Ljava/lang/Object;Z)V',
                                       'Saves the given image plane to the current file.')
-#        savePlane = jutil.make_method('savePlane', '(Ljava/lang/Object;IZZ)V', 
+#        savePlane = jutil.make_method('savePlane', '(Ljava/lang/Object;IZZ)V',
 #                                      'Saves the given image plane to the given series in the current file.')
-        setColorModel = jutil.make_method('setColorModel', '(Ljava/awt/image/ColorModel;)V', 
+        setColorModel = jutil.make_method('setColorModel', '(Ljava/awt/image/ColorModel;)V',
                                           'Sets the color model.')
-        setCompression = jutil.make_method('setCompression', '(Ljava/lang/String;)V', 
+        setCompression = jutil.make_method('setCompression', '(Ljava/lang/String;)V',
                                            'Sets the current compression type.')
-        setFramesPerSecond = jutil.make_method('setFramesPerSecond', '(I)V', 
+        setFramesPerSecond = jutil.make_method('setFramesPerSecond', '(I)V',
                                                'Sets the frames per second to use when writing.')
-        setInterleaved = jutil.make_method('setInterleaved', '(Z)V', 
+        setInterleaved = jutil.make_method('setInterleaved', '(Z)V',
                                            'Sets whether or not the channels in an image are interleaved.')
-        setMetadataRetrieve = jutil.make_method('setMetadataRetrieve', '(Lloci/formats/meta/MetadataRetrieve;)V', 
+        setMetadataRetrieve = jutil.make_method('setMetadataRetrieve', '(Lloci/formats/meta/MetadataRetrieve;)V',
                                                 'Sets the metadata retrieval object from which to retrieve standardized metadata.')
         setValidBitsPerPixel = jutil.make_method(
             'setValidBitsPerPixel', '(I)V',
@@ -192,12 +194,12 @@ def make_iformat_writer_class(class_name):
         setSeries = jutil.make_method(
             'setSeries', '(I)V',
             '''Set the series for the image file
-            
+
             series - the zero-based index of the image stack in the file,
             for instance in a multi-image tif.''')
-        
+
     return IFormatWriter
-    
+
 def make_image_writer_class():
     '''Return an image writer class for the given Java environment'''
     env = jutil.get_env()
@@ -208,7 +210,7 @@ def make_image_writer_class():
     #
     # This uses the writers.txt file from inside the loci_tools.jar
     #
-    class_list = jutil.make_instance("loci/formats/ClassList", 
+    class_list = jutil.make_instance("loci/formats/ClassList",
                                      "(Ljava/lang/String;"
                                      "Ljava/lang/Class;" # base
                                      "Ljava/lang/Class;)V", # location in jar
@@ -217,30 +219,30 @@ def make_image_writer_class():
         new_fn = jutil.make_new(class_name, '(Lloci/formats/ClassList;)V')
         def __init__(self):
             self.new_fn(class_list)
-            
-        setId = jutil.make_method('setId', '(Ljava/lang/String;)V', 
+
+        setId = jutil.make_method('setId', '(Ljava/lang/String;)V',
                                   'Sets the current file name.')
         addStatusListener = jutil.make_method('addStatusListener', '()Lloci/formats/StatusListener;',
                                               'Adds a listener for status update events.')
         close = jutil.make_method('close','()V',
                                   'Closes currently open file(s) and frees allocated memory.')
-        getFormat = jutil.make_method('getFormat', '()Ljava/lang/String;', 
+        getFormat = jutil.make_method('getFormat', '()Ljava/lang/String;',
                                       'Gets the name of this file format.')
         getNativeDataType = jutil.make_method('getNativeDataType', '()Ljava/lang/Class;',
                                               'Returns the native data type of image planes for this reader, as returned by IFormatReader.openPlane(int, int, int, int, int) or IFormatWriter#saveData.')
         getStatusListeners = jutil.make_method('getStatusListeners', '()[Lloci/formats/StatusListener;',
                                                'Gets a list of all registered status update listeners.')
-        getSuffixes = jutil.make_method('getSuffixes', '()Ljava/lang/String;', 
+        getSuffixes = jutil.make_method('getSuffixes', '()Ljava/lang/String;',
                                         'Gets the default file suffixes for this file format.')
-        getWriter = jutil.make_method('getWriter', '()Lloci/formats/IFormatWriter;', 
+        getWriter = jutil.make_method('getWriter', '()Lloci/formats/IFormatWriter;',
                                       'Gets the writer used to save the current file.')
-#        getWriter = jutil.make_method('getWriter', '(Ljava/lang/Class)Lloci/formats/IFormatWriter;', 
+#        getWriter = jutil.make_method('getWriter', '(Ljava/lang/Class)Lloci/formats/IFormatWriter;',
 #                                      'Gets the file format writer instance matching the given class.')
-#        getWriter = jutil.make_method('getWriter', '(Ljava/lang/String;)Lloci/formats/IFormatWriter;', 
+#        getWriter = jutil.make_method('getWriter', '(Ljava/lang/String;)Lloci/formats/IFormatWriter;',
 #                                      'Gets the writer used to save the given file.')
-        getWriters = jutil.make_method('getWriters', '()[Lloci/formats/IFormatWriter;', 
+        getWriters = jutil.make_method('getWriters', '()[Lloci/formats/IFormatWriter;',
                                        'Gets all constituent file format writers.')
-        isThisType = jutil.make_method('isThisType', '(Ljava/lang/String;)Z', 
+        isThisType = jutil.make_method('isThisType', '(Ljava/lang/String;)Z',
                                        'Checks if the given string is a valid filename for this file format.')
         removeStatusListener = jutil.make_method('removeStatusListener', '(Lloci/formats/StatusListener;)V',
                                                  'Saves the given byte array to the current file.')
@@ -252,10 +254,10 @@ def make_ome_tiff_writer_class():
     IFormatWriter = make_iformat_writer_class(class_name)
 
     class OMETiffWriter(IFormatWriter):
-        
+
         def __init__(self):
             self.new_fn = jutil.make_new(self.class_name, '()V')
-            self.setId = jutil.make_method('setId', '(Ljava/lang/String;)V', 
+            self.setId = jutil.make_method('setId', '(Ljava/lang/String;)V',
                                            'Sets the current file name.')
             self.close = jutil.make_method(
                 'close','()V',
@@ -263,34 +265,34 @@ def make_ome_tiff_writer_class():
             self.saveBytesIFD = jutil.make_method(
                 'saveBytes', '(I[BLloci/formats/tiff/IFD;)V',
                 '''save a byte array to an image channel
-                
+
                 index - image index
                 bytes - byte array to save
                 ifd - a loci.formats.tiff.IFD instance that gives all of the
                 IFD values associated with the channel''')
-            
+
             self.new_fn()
 
     return OMETiffWriter
-    
+
 def make_writer_wrapper_class(class_name):
     '''Make an ImageWriter wrapper class
-    
+
     class_name - the name of the wrapper class
-    
+
     You can instantiate an instance of the wrapper class like this:
     writer = XXX(ImageWriter())
     '''
     IFormatWriter = make_iformat_writer_class(class_name)
     class WriterWrapper(IFormatWriter):
         __doc__ = '''A wrapper for %s
-        
+
         See http://hudson.openmicroscopy.org.uk/job/LOCI/javadoc/loci/formats/ImageWriter.html
         '''%class_name
         new_fn = jutil.make_new(class_name, '(Lloci/formats/IFormatWriter;)V')
         def __init__(self, writer):
             self.new_fn(writer)
-            
+
         setId = jutil.make_method('setId', '(Ljava/lang/String;)V',
                                   'Sets the current file name.')
     return WriterWrapper
@@ -298,21 +300,21 @@ def make_writer_wrapper_class(class_name):
 
 def make_format_writer_class(class_name):
     '''Make a FormatWriter wrapper class
-    
+
     class_name - the name of a class that implements loci.formats.FormatWriter
                  Known names in the loci.formats.out package:
                      APNGWriter, AVIWriter, EPSWriter, ICSWriter, ImageIOWriter,
                      JPEG2000Writer, JPEGWriter, LegacyQTWriter, OMETiffWriter,
                      OMEXMLWriter, QTWriter, TiffWriter
     '''
-    new_fn = jutil.make_new(class_name, 
+    new_fn = jutil.make_new(class_name,
                             '(Ljava/lang/String;Ljava/lang/String;)V')
     class FormatWriter(object):
         __doc__ = '''A wrapper for %s implementing loci.formats.FormatWriter
         See http://hudson.openmicroscopy.org.uk/job/LOCI/javadoc/loci/formats/FormatWriter'''%class_name
         def __init__(self):
             self.new_fn()
-            
+
         canDoStacks = jutil.make_method('canDoStacks','()Z',
                                         'Reports whether the writer can save multiple images to a single file')
         getColorModel = jutil.make_method('getColorModel',
@@ -329,7 +331,7 @@ def make_format_writer_class(class_name):
         getMetadataRetrieve = jutil.make_method('getMetadataRetrieve',
                                                 '()Lloci/formats/meta/MetadataRetrieve;',
                                                 'Retrieves the current metadata retrieval object for this writer.')
-        
+
         getPixelTypes = jutil.make_method('getPixelTypes',
                                           '()[I')
         isInterleaved = jutil.make_method('isInterleaved','()Z',
@@ -358,7 +360,7 @@ def make_format_writer_class(class_name):
 
 def getRGBColorSpace():
     '''Get a Java object that represents an RGB color space
-    
+
     See java.awt.color.ColorSpace: this returns the linear RGB color space
     '''
     cs_linear_rgb = jutil.get_static_field('java/awt/color/ColorSpace',
@@ -369,7 +371,7 @@ def getRGBColorSpace():
 
 def getGrayColorSpace():
     '''Get a Java object that represents an RGB color space
-    
+
     See java.awt.color.ColorSpace: this returns the linear RGB color space
     '''
     cs_gray = jutil.get_static_field('java/awt/color/ColorSpace',
@@ -391,24 +393,24 @@ TYPE_USHORT = 'TYPE_USHORT'
 '''Constant for color model transfer type indicating integer per pixel'''
 TYPE_INT = 'TYPE_INT'
 
-def getColorModel(color_space, 
-                  has_alpha=False, 
+def getColorModel(color_space,
+                  has_alpha=False,
                   is_alpha_premultiplied = False,
                   transparency = OPAQUE,
                   transfer_type = TYPE_BYTE):
     '''Return a java.awt.image.ColorModel color model
-    
+
     color_space - a java.awt.color.ColorSpace such as returned by
     getGrayColorSpace or getRGBColorSpace
-    
+
     has_alpha - True if alpha channel is specified
-    
+
     is_alpha_premultiplied - True if other channel values have already
     been reduced by the alpha multiplier, False if the channel values are
     independent of the multiplier.
-    
+
     transparency - one of BITMASK, OPAQUE or TRANSPARENT.
-    
+
     transfer_type - one of TYPE_BYTE, TYPE_USHORT, TYPE_INT
     '''
     jtransparency = jutil.get_static_field('java/awt/Transparency',
@@ -424,9 +426,9 @@ if __name__ == "__main__":
     import wx
     import matplotlib.backends.backend_wxagg as mmmm
     import bioformats
-    from formatreader import *
-    from metadatatools import *
-    
+    from .formatreader import *
+    from .metadatatools import *
+
     app = wx.PySimpleApp()
 
 #    dlg = wx.FileDialog(None)
@@ -442,10 +444,10 @@ if __name__ == "__main__":
     out_file = '/Users/afraser/Desktop/test_output.avi'
     try:
         os.remove(out_file)
-        print 'previous output file deleted'
+        print('previous output file deleted')
     except:
-        print 'no output file to delete'
-    
+        print('no output file to delete')
+
     env = jutil.attach()
     ImageReader = make_image_reader_class()
     ChannelSeparator = make_reader_wrapper_class("loci/formats/ChannelSeparator")
@@ -454,7 +456,7 @@ if __name__ == "__main__":
     # writer testing
     ImageWriter = make_image_writer_class()
     writer = ImageWriter()
-    
+
     w = 400
     h = 400
     c = 3
@@ -463,7 +465,7 @@ if __name__ == "__main__":
     images = []
     for tt in range(t):
         images += [(np.random.rand(w, h, c) * 255).astype('uint8')]
-                
+
     imeta = createOMEXMLMetadata()
     meta = wrap_imetadata_object(imeta)
     meta.createRoot()
@@ -476,33 +478,33 @@ if __name__ == "__main__":
     meta.setPixelsSizeZ(z, 0, 0)
     meta.setPixelsSizeT(t, 0, 0)
     meta.setLogicalChannelSamplesPerPixel(c, 0, 0)
-    
-    print 'big endian:', meta.getPixelsBigEndian(0, 0)
-    print 'dim order:', meta.getPixelsDimensionOrder(0, 0)
-    print 'pixel type:', meta.getPixelsPixelType(0, 0)
-    print 'size x:', meta.getPixelsSizeX(0, 0)
-    print 'size y:', meta.getPixelsSizeY(0, 0)
-    print 'size c:', meta.getPixelsSizeC(0, 0)
-    print 'size z:', meta.getPixelsSizeZ(0, 0)
-    print 'size t:', meta.getPixelsSizeT(0, 0)
-    print 'samples per pixel:', meta.getLogicalChannelSamplesPerPixel(0, 0)
+
+    print('big endian:', meta.getPixelsBigEndian(0, 0))
+    print('dim order:', meta.getPixelsDimensionOrder(0, 0))
+    print('pixel type:', meta.getPixelsPixelType(0, 0))
+    print('size x:', meta.getPixelsSizeX(0, 0))
+    print('size y:', meta.getPixelsSizeY(0, 0))
+    print('size c:', meta.getPixelsSizeC(0, 0))
+    print('size z:', meta.getPixelsSizeZ(0, 0))
+    print('size t:', meta.getPixelsSizeT(0, 0))
+    print('samples per pixel:', meta.getLogicalChannelSamplesPerPixel(0, 0))
 
     writer.setMetadataRetrieve(meta)
     writer.setId(out_file)
     for image in images:
-        if len(image.shape)==3 and image.shape[2] == 3:  
+        if len(image.shape)==3 and image.shape[2] == 3:
             save_im = np.array([image[:,:,0], image[:,:,1], image[:,:,2]]).astype(np.uint8).flatten()
         else:
             save_im = image.astype(np.uint8).flatten()
         writer.saveBytes(env.make_byte_array(save_im), (image is images[-1]))
     writer.close()
-    
-    print 'Done writing image :)'
+
+    print('Done writing image :)')
 #    import PIL.Image as Image
 #    im = Image.open(out_file, 'r')
 #    im.show()
-    
+
     jutil.detach()
     app.MainLoop()
-    
-    
+
+
