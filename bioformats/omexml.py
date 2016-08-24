@@ -317,7 +317,11 @@ class OMEXML(object):
             xml = default_xml
         if isinstance(xml, str):
             xml = xml.encode("utf-8")
-        self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
+        try:
+            self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
+        except UnicodeEncodeError:
+            xml = xml.encode("utf-8")
+            self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
 
         # determine OME namespaces
         self.ns = get_namespaces(self.dom.getroot())
