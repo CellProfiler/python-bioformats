@@ -322,7 +322,6 @@ class OMEXML(object):
         except UnicodeEncodeError:
             xml = xml.encode("utf-8")
             self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
-
         # determine OME namespaces
         self.ns = get_namespaces(self.dom.getroot())
         if self.ns['ome'] is None:
@@ -608,6 +607,21 @@ class OMEXML(object):
             and set the pixel type.
             '''
             return self.node.get("Type")
+
+        def get_PhysicalSizeX(self):
+            '''The length of a single pixel in microns in X direction'''
+            return get_float_attr(self.node, "PhysicalSizeX")
+        def set_PhysicalSizeX(self, value):
+            self.node.set("PhysicalSizeX", str(value))
+        PhysicalSizeX = property(get_PhysicalSizeX, set_PhysicalSizeX)
+
+        def get_PhysicalSizeY(self):
+            '''The length of a single pixel in microns in Y direction'''
+            return get_float_attr(self.node, "PhysicalSizeY")
+        def set_PhysicalSizeY(self, value):
+            self.node.set("PhysicalSizeY", str(value))
+        PhysicalSizeY = property(get_PhysicalSizeY, set_PhysicalSizeY)
+
         def set_PixelType(self, value):
             self.node.set("Type", value)
         PixelType = property(get_PixelType, set_PixelType)
@@ -716,6 +730,95 @@ class OMEXML(object):
             '''Get the indexed plane from the Pixels element'''
             plane = self.node.findall(qn(self.ns['ome'], "Plane"))[index]
             return OMEXML.Plane(plane)
+
+    class Instrument(object):
+        '''Representation of the OME/Instrument element'''
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_ID(self):
+            return self.node.get("ID")
+
+        def set_ID(self, value):
+            self.node.set("ID", value)
+
+        ID = property(get_ID, set_ID)
+
+        @property
+        def Detector(self):
+            return OMEXML.Detector(self.node.find(qn(self.ns['ome'], "Detector")))
+        
+        @property
+        def Objective(self):
+            return OMEXML.Objective(self.node.find(qn(self.ns['ome'], "Objective")))
+
+
+    def instrument(self, index=0):
+        return self.Instrument(self.root_node.findall(qn(self.ns['ome'], "Instrument"))[index])
+
+
+    class Objective(object):
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_ID(self):
+            return self.node.get("ID")
+        def set_ID(self, value):
+            self.node.set("ID", value)
+        ID = property(get_ID, set_ID)
+
+        def get_LensNA(self):
+            return self.node.get("LensNA")
+
+        def set_LensNA(self, value):
+            self.node.set("LensNA", value)
+        LensNA = property(get_LensNA, set_LensNA)
+
+        def get_NominalMagnification(self):
+            return self.node.get("NominalMagnification")
+        def set_NominalMagnification(self, value):
+            self.node.set("NominalMagnification", value)
+        NominalMagnification = property(get_NominalMagnification, set_NominalMagnification)
+
+        def get_WorkingDistanceUnit(self):
+            return get_int_attr(self.node, "WorkingDistanceUnit")
+        def set_WorkingDistanceUnit(self, value):
+            self.node.set("WorkingDistanceUnit", str(value))
+        WorkingDistanceUnit = property(get_WorkingDistanceUnit, set_WorkingDistanceUnit)
+    
+    class Detector(object):
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_ID(self):
+            return self.node.get("ID")
+        def set_ID(self, value):
+            self.node.set("ID", value)
+        ID = property(get_ID, set_ID)
+
+        def get_Gain(self):
+            return self.node.get("Gain")
+
+        def set_Gain(self, value):
+            self.node.set("Gain", value)
+        Gain = property(get_Gain, set_Gain)
+
+        def get_Model(self):
+            return self.node.get("Model")
+        def set_Model(self, value):
+            self.node.set("Model", value)
+        Model = property(get_Model, set_Model)
+
+        def get_Type(self):
+            return get_int_attr(self.node, "Type")
+        def set_Type(self, value):
+            self.node.set("Type", str(value))
+        Type = property(get_Type, set_Type)
+
+
 
     class StructuredAnnotations(dict):
         '''The OME/StructuredAnnotations element
