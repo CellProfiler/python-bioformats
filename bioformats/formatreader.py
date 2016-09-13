@@ -748,6 +748,13 @@ class ImageReader(object):
         :param channel_names: provide the channel names for the OME metadata
         :param XYWH: a (x, y, w, h) tuple
         '''
+        FormatTools = make_format_tools_class()
+        ChannelSeparator = make_reader_wrapper_class(
+            "loci/formats/ChannelSeparator")
+        env = jutil.get_env()
+        if series is not None:
+            self.rdr.setSeries(series)
+
         if XYWH is not None:
             assert isinstance(XYWH, tuple) and len(XYWH) == 4, "Invalid XYWH tuple"
             openBytes_func = lambda x: self.rdr.openBytesXYWH(x, XYWH[0], XYWH[1], XYWH[2], XYWH[3])
@@ -755,12 +762,6 @@ class ImageReader(object):
         else:
             openBytes_func = self.rdr.openBytes
             width, height = self.rdr.getSizeX(), self.rdr.getSizeY()
-        FormatTools = make_format_tools_class()
-        ChannelSeparator = make_reader_wrapper_class(
-            "loci/formats/ChannelSeparator")
-        env = jutil.get_env()
-        if series is not None:
-            self.rdr.setSeries(series)
 
         pixel_type = self.rdr.getPixelType()
         little_endian = self.rdr.isLittleEndian()
