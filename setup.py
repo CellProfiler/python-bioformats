@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+import sys
 import os.path
 import re
 import subprocess
@@ -44,7 +45,7 @@ def get_version():
 
 setup(
     name="python-bioformats",
-    version=get_version().decode("utf-8"),
+    version= str(get_version(),"utf-8") if sys.version_info.major == 3 else get_version().decode("utf-8"),
     description="Read and write life sciences file formats",
     long_description='''Python-bioformats is a Python wrapper for Bio-Formats, a standalone
     Java library for reading and writing life sciences image file
@@ -66,6 +67,7 @@ setup(
              ],
     license='GPL License',
     package_data={'bioformats': ['jars/*.jar']},
-    install_requires=['javabridge>=1.0']
+    install_requires=['javabridge>=1.0'],
+    use_2to3=True
 )
 
