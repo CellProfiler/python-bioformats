@@ -1,4 +1,47 @@
+from __future__ import absolute_import, print_function
+
+import sys
+import os.path
+import re
+import subprocess
 import setuptools
+
+def get_version():
+    """Get version from git or file system.
+
+    If this is a git repository, try to get the version number by
+    running ``git describe``, then store it in
+    bioformats/_version.py. Otherwise, try to load the version number
+    from that file. If both methods fail, quietly return None.
+
+    """
+    git_version = None
+    if os.path.exists(os.path.join(os.path.dirname(__file__), '.git')):
+        import subprocess
+        try:
+            git_version = subprocess.check_output(['git', 'describe']).strip()
+        except:
+            pass
+
+    version_file = os.path.join(os.path.dirname(__file__), 'bioformats',
+                                '_version.py')
+    if os.path.exists(version_file):
+        with open(version_file) as f:
+            cached_version_line = f.read().strip()
+        try:
+            # From http://stackoverflow.com/a/3619714/17498
+            cached_version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                                       cached_version_line, re.M).group(1)
+        except:
+            raise RuntimeError("Unable to find version in %s" % version_file)
+    else:
+        cached_version = None
+
+    if git_version and git_version != cached_version:
+        with open(version_file, 'w') as f:
+            print('__version__ = "%s"' % git_version, file=f)
+
+    return git_version or cached_version
 
 setuptools.setup(
     author="Lee Kamentsky",
@@ -32,5 +75,5 @@ setuptools.setup(
         "bioformats"
     ],
     url="http://github.com/CellProfiler/python-bioformats/",
-    version="1.0.9"
+    version= str(get_version(),"utf-8") if sys.version_info.major == 3 else get_version().decode("utf-8"),
 )
