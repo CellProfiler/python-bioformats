@@ -1,52 +1,15 @@
-language: java
-env:
-   - PYTHON_VERSION="2.7"
-   - PYTHON_VERSION="3.5"
-before_install:
-   # Get the tag if it wasn't provided. Travis doesn't provide this if it isn't a tagged build.
-   - if [ -z $TRAVIS_TAG ]; then TRAVIS_TAG=`git tag --contains` ; fi
-   - echo $TRAVIS_TAG
-   # Move out of git directory to build root.
-   - cd ../..
-   - pwd
-install:
-   # Download and configure conda.
-   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-   - bash miniconda.sh -b -p $HOME/miniconda
-   - export PATH="$HOME/miniconda/bin:$PATH"
-   - conda config --set always_yes yes
-   - conda config --set show_channel_urls True
-   - source activate root
-   # Install basic conda dependencies.
-   - touch $HOME/miniconda/conda-meta/pinned
-   - echo "conda-build ==1.16.0" >> $HOME/miniconda/conda-meta/pinned
-   - conda update --all
-   - conda install conda-build
-   # Setup environment for testing and install all dependencies and our package.
-   - cd $TRAVIS_REPO_SLUG
-   - conda create --use-local -n testenv python=$PYTHON_VERSION
-   - source activate testenv
-   - conda install numpy
-   - python setup.py install
-   # Install sphinx to build documentation.
-   - conda install sphinx
-   # Install coverage and coveralls to generate and submit test coverage results for coveralls.io.
-   - echo "coverage 3.*" >> $HOME/miniconda/envs/testenv/conda-meta/pinned
-   - conda install nose
-   - conda install coverage
-   - pip install coveralls
-   # Clean up downloads as there are quite a few and they waste space/memory.
-   - conda clean -tipsy
-   - rm -rfv $HOME/.cache/pip
-script:
-   # Run tests.
-   - python nosetests.py
-   # Build docs.
-   - cd docs
-   - make html
-   - cd ..
-#after_success:
-   # Submit results to coveralls.io.
-   #- coveralls
-# Use container format for TravisCI for quicker startup and builds.
+language: python
+python:
+  - "2.7"
+  - "3.5"
 sudo: false
+notifications:
+  email: false
+install:
+  - pip install --upgrade pip wheel
+  - pip install --upgrade numpy
+  - pip install sphinx
+  - pip install .
+script:
+  - nosetests
+  - cd docs && make html
