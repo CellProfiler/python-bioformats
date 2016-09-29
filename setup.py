@@ -1,6 +1,8 @@
 import setuptools
 
 setuptools.setup(
+    author="Lee Kamentsky",
+    author_email="leek@broadinstitute.org",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",

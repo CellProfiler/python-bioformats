@@ -13,3 +13,13 @@ install:
 script:
   - nosetests
   - cd docs && make html
+deploy:
+  provider: pypi
+  user: mcquin
+  password:
+    secure: PrFX2wJrhchChzJD8DX+q7q9UK9zrxl0CN3AdT8kBEIAxzVpM+jCS0Znt7yPHipNjhhvCPtcP2HqmkKuV3o4EgGb/E7BORbKnvBmnLVPcAOpBJXSGxqSXctmPUDlV3FF6Vi2MSTzOIcAPBSqQEB9HBtEUYO34gu2R0dwC3LdrVM=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: CellProfiler/python-bioformats
+  skip_cleanup: true
