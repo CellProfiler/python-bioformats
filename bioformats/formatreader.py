@@ -50,8 +50,13 @@ import bioformats
 from . import metadatatools as metadatatools
 import javabridge as javabridge
 
-from omero_reader import OmeroReader
-from omero_reader.utils import omero_on_the_path, omero_reader_enabled
+OMERO_READER_IMPORTED = False
+try:
+    from omero_reader import OmeroReader, OMERO_IMPORTED
+    from omero_reader.utils import omero_reader_enabled
+    OMERO_READER_IMPORTED = True
+except ImportError:
+    pass
 
 K_OMERO_SERVER = "omero_server"
 K_OMERO_PORT = "omero_port"
@@ -930,7 +935,8 @@ def get_image_reader(key, path=None, url=None):
         # is True OMERO python reader can be used to directly request
         # the image pixels from the server.
         # Following this route gives almost 10x speed up.
-        if omero_on_the_path() and omero_reader_enabled() and \
+        if OMERO_READER_IMPORTED and OMERO_IMPORTED and \
+                omero_reader_enabled() and \
                 url is not None and url.lower().startswith("omero:"):
             logger.debug("Initializing Python reader.")
             rdr = OmeroReader(__omero_server, __omero_session_id, url=url)
