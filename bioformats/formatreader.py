@@ -50,6 +50,14 @@ import bioformats
 from . import metadatatools as metadatatools
 import javabridge as javabridge
 
+OMERO_READER_IMPORTED = False
+try:
+    from omero_reader import OmeroReader, OMERO_IMPORTED
+    from omero_reader.utils import omero_reader_enabled
+    OMERO_READER_IMPORTED = True
+except ImportError:
+    pass
+
 K_OMERO_SERVER = "omero_server"
 K_OMERO_PORT = "omero_port"
 K_OMERO_USER = "omero_user"
@@ -913,6 +921,7 @@ def get_image_reader(key, path=None, url=None):
     key - use this key to keep only a single cache member associated with
           that key open at a time.
     '''
+    logger.debug("Getting image reader for: %s, %s, %s" % (key, path, url))
     if key in __image_reader_key_cache:
         old_path, old_url = __image_reader_key_cache[key]
         old_count, rdr = __image_reader_cache[old_path, old_url]
@@ -922,7 +931,18 @@ def get_image_reader(key, path=None, url=None):
     if (path, url) in __image_reader_cache:
         old_count, rdr = __image_reader_cache[path, url]
     else:
-        rdr = ImageReader(path=path, url=url)
+        # If OMERO.py is found on the PYTHONPATH and OMERO_READER_ENABLED
+        # is True OMERO python reader can be used to directly request
+        # the image pixels from the server.
+        # Following this route gives almost 10x speed up.
+        if OMERO_READER_IMPORTED and OMERO_IMPORTED and \
+                omero_reader_enabled() and \
+                url is not None and url.lower().startswith("omero:"):
+            logger.debug("Initializing Python reader.")
+            rdr = OmeroReader(__omero_server, __omero_session_id, url=url)
+        else:
+            logger.debug("Falling back to Java reader.")
+            rdr = ImageReader(path=path, url=url)
         old_count = 0
     __image_reader_cache[path, url] = (old_count+1, rdr)
     __image_reader_key_cache[key] = (path, url)
@@ -945,6 +965,7 @@ def release_image_reader(key):
 def clear_image_reader_cache():
     '''Get rid of any open image readers'''
     for use_count, rdr in __image_reader_cache.values():
+        logger.debug("Closing reader %s" % rdr)
         rdr.close()
     __image_reader_cache.clear()
     __image_reader_key_cache.clear()
