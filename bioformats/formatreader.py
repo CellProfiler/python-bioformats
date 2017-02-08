@@ -538,7 +538,7 @@ class ImageReader(object):
 
     '''
 
-    def __init__(self, path=None, url=None, perform_init=True):
+    def __init__(self, path=None, url=None, perform_init=True, groupFiles=False):
         self.stream = None
         file_scheme = "file:"
         self.url = url
@@ -561,7 +561,7 @@ class ImageReader(object):
                         self.rdr = get_omero_reader()
                         self.path = url
                         if perform_init:
-                            self.init_reader()
+                            self.init_reader(groupFiles)
                         return
                     except jutil.JavaException, e:
                         je = e.throwable
@@ -666,7 +666,7 @@ class ImageReader(object):
         self.rdr = IFormatReader()
         self.rdr.o = jrdr
         if perform_init:
-            self.init_reader()
+            self.init_reader(groupFiles)
         
     def __enter__(self):
         return self
@@ -690,10 +690,10 @@ class ImageReader(object):
         #
         jutil.static_call("java/lang/System", "gc","()V")
         
-    def init_reader(self):
+    def init_reader(self, groupFiles=False):
         mdoptions = metadatatools.get_metadata_options(metadatatools.ALL)
         self.rdr.setMetadataOptions(mdoptions)
-        self.rdr.setGroupFiles(False)
+        self.rdr.setGroupFiles(groupFiles)
         self.metadata = metadatatools.createOMEXMLMetadata()
         self.rdr.setMetadataStore(self.metadata)
         try:
