@@ -315,7 +315,7 @@ class OMEXML(object):
     def __init__(self, xml=None):
         if xml is None:
             xml = default_xml
-        if isinstance(xml, str):
+        if isinstance(xml, basestring):
             xml = xml.encode("utf-8")
         self.dom = ElementTree.ElementTree(ElementTree.fromstring(xml))
 
