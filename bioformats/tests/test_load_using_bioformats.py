@@ -27,7 +27,6 @@ class TestLoadUsingBioformats(unittest.TestCase):
 
     def setUp(self):
         javabridge.attach()
-        bioformats.init_logger()
 
     def tearDown(self):
         javabridge.detach()
@@ -46,7 +45,6 @@ class TestLoadUsingBioformats(unittest.TestCase):
 class TestLoadUsingBioformatsURL(unittest.TestCase):
     def setUp(self):
         javabridge.attach()
-        bioformats.init_logger()
 
     def tearDown(self):
         javabridge.detach()

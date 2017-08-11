@@ -27,9 +27,7 @@ import bioformats
 
 class TestFormatReader(unittest.TestCase):
     def setUp(self):
-        J.start_vm(class_path=bioformats.JARS)
         J.attach()
-        bioformats.init_logger()
 
     def tearDown(self):
         J.detach()
@@ -160,7 +158,7 @@ class TestFormatReader(unittest.TestCase):
              [5, 2, 3, 3, 2, 2, 2, 3, 2, 2]], dtype=np.uint8)
         self.assertTrue(np.all(expected_0_10_0_10 == data_0_10_0_10))
         # self.assertTrue(np.all(expected_n10_n10 == data[-10:,-10:]))
-        
+
     def test_03_03_load_using_bioformats_url(self):
         url = "https://github.com/CellProfiler/python-bioformats/raw/1.0.5/bioformats/tests/Channel1-01-A-01.tif"
         try:
@@ -171,7 +169,7 @@ class TestFormatReader(unittest.TestCase):
             def bad_url(e=e):
                 raise e
             unittest.expectedFailure(bad_url)()
-        
+
         data = F.load_using_bioformats_url(url, rescale=False)
         self.assertSequenceEqual(data.shape, (640, 640))
 

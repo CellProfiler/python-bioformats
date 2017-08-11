@@ -24,7 +24,7 @@ from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
 
-JAR_VERSION = '5.0.6'
+JAR_VERSION = '5.5.3'
 
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
                           for name in ['loci_tools']]
@@ -88,16 +88,6 @@ from .formatreader import K_OMERO_SERVER, K_OMERO_PORT, K_OMERO_USER, K_OMERO_SE
          K_OMERO_PASSWORD, K_OMERO_CONFIG_FILE
 
 from . import omexml
-
-def init_logger():
-    rootLoggerName = javabridge.get_static_field("org/slf4j/Logger",
-                                                 "ROOT_LOGGER_NAME", "Ljava/lang/String;")
-    rootLogger = javabridge.static_call("org/slf4j/LoggerFactory",
-                                       "getLogger", "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
-    logLevel = javabridge.get_static_field("ch/qos/logback/classic/Level",
-                                                "WARN", "Lch/qos/logback/classic/Level;")
-    javabridge.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V",
-                    logLevel)
 
 
 if __name__ == "__main__":

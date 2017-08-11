@@ -13,6 +13,11 @@ setuptools.setup(
         "Topic :: Multimedia :: Graphics :: Graphics Conversion"
     ],
     description="Read and write life sciences file formats",
+    extras_require={
+        "test": [
+            "pytest"
+        ]
+    },
     install_requires=[
         "javabridge>=1.0"
     ],
