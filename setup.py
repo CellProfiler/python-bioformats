@@ -19,6 +19,7 @@ setuptools.setup(
         ]
     },
     install_requires=[
+        "future",
         "javabridge>=1.0"
     ],
     license="GPL License",
