@@ -43,26 +43,26 @@ NS_DEFAULT = "http://www.openmicroscopy.org/Schemas/{ns_key}/2013-06"
 NS_RE = r"http://www.openmicroscopy.org/Schemas/(?P<ns_key>.*)/[0-9/-]"
 
 default_xml = """<?xml version="1.0" encoding="UTF-8"?>
-<OME xmlns="{ns_ome_default}s"
+<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2013-06 http://www.openmicroscopy.org/Schemas/OME/2012-03/ome.xsd">
-  <Image ID="Image:0" Name="default.png">
-    <AcquisitionDate>%(DEFAULT_NOW)s</AcquisitionDate>
-    <Pixels DimensionOrder="XYCTZ"
-            ID="Pixels:0"
-            SizeC="1"
-            SizeT="1"
-            SizeX="512"
-            SizeY="512"
-            SizeZ="1"
-            Type="uint8">
-<Channel ID="Channel:0:0" SamplesPerPixel="1">
-        <LightPath/>
-      </Channel>
-      <BinData xmlns="%(NS_BINARY_FILE)s"
-       BigEndian="false" Length="0"/>
-    </Pixels>
-  </Image>
+     xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd">
+    <Image ID="Image:0" Name="default.png">
+        <AcquisitionDate>%(DEFAULT_NOW)s</AcquisitionDate>
+        <Pixels BigEndian="false"
+                DimensionOrder="XYCZT"
+                ID="Pixels:0"
+                Interleaved="false"
+                SizeC="1"
+                SizeT="1"
+                SizeX="512"
+                SizeY="512"
+                SizeZ="1"
+                Type="uint8">
+            <Channel ID="Channel:0:0" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+        </Pixels>
+    </Image>
   <StructuredAnnotations xmlns="{ns_sa_default}s"/>
 </OME>""".format(ns_ome_default=NS_DEFAULT.format(ns_key='ome'), ns_sa_default=NS_DEFAULT.format(ns_key='sa'))
 
