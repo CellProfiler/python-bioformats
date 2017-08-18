@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd">
+	<Image ID="Image:0" Name="Channel1-01-A-01.tif">
+		<AcquisitionDate>2008-02-05T17:24:46</AcquisitionDate>
+		<Pixels DimensionOrder="XYCZT"
+				ID="Pixels:0"
+                PhysicalSizeX="352.77777777777777"
+                PhysicalSizeY="352.77777777777777"
+                SizeC="2"
+                SizeT="3"
+                SizeX="640"
+			    SizeY="512"
+                SizeZ="1"
+                Type="uint8">
+			<Channel ID="Channel:0:0" SamplesPerPixel="1" Name="Actin">
+				<LightPath />
+			</Channel>
+			<BinData xmlns="http://www.openmicroscopy.org/Schemas/BinaryFile/2013-06" BigEndian="true" Length="0"/>
+            <Plane TheC="0"
+                   TheT="0"
+                   TheZ="0"
+                   DeltaT="1.25"
+                   ExposureTime="0.25"
+                   PositionX="3.5"
+                   PositionY="4.75"
+                   PositionZ="2.25"/>
+        </Pixels>
+	</Image>
+	<StructuredAnnotations
+		xmlns="http://www.openmicroscopy.org/Schemas/SA/2013-06">
+		<XMLAnnotation ID="Annotation:0">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>BIG_TIFF</Key>
+					<Value>false</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:1">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>ImageLength</Key>
+					<Value>640</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:2">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>MetaDataPhotometricInterpretation</Key>
+					<Value>Monochrome</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:3">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>PhotometricInterpretation</Key>
+					<Value>Palette</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:4">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>XResolution</Key>
+					<Value>72</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:5">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>NewSubfileType</Key>
+					<Value>0</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:6">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>DateTime</Key>
+					<Value>2008:02:05 17:24:46</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:7">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>MetaMorph</Key>
+					<Value>no</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:8">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>Software</Key>
+					<Value>Adobe Photoshop CS2 Macintosh</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:9">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>YResolution</Key>
+					<Value>72</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:10">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>PIXEL_X_DIMENSION</Key>
+					<Value>640</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:11">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>ResolutionUnit</Key>
+					<Value>Inch</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:12">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>PIXEL_Y_DIMENSION</Key>
+					<Value>640</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:13">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>Compression</Key>
+					<Value>Uncompressed</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:14">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>LITTLE_ENDIAN</Key>
+					<Value>false</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:15">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>COLOR_SPACE</Key>
+					<Value>1</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:16">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>BitsPerSample</Key>
+					<Value>8</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:17">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>NumberOfChannels</Key>
+					<Value>3</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:18">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>Orientation</Key>
+					<Value>1st row - top; 1st column - left</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:19">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>SamplesPerPixel</Key>
+					<Value>1</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+		<XMLAnnotation ID="Annotation:20">
+			<Value>
+				<OriginalMetadata xmlns="openmicroscopy.org/OriginalMetadata">
+					<Key>ImageWidth</Key>
+					<Value>640</Value>
+				</OriginalMetadata>
+			</Value>
+		</XMLAnnotation>
+	</StructuredAnnotations>
+</OME>

@@ -9,9 +9,9 @@ install:
   - pip install --upgrade pip wheel
   - pip install --upgrade numpy
   - pip install sphinx
-  - pip install .
+  - pip install --upgrade .[test]
 script:
-  - nosetests
+  - pytest
   - cd docs && make html && cd ..
 deploy:
   provider: pypi

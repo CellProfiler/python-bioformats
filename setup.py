@@ -13,7 +13,13 @@ setuptools.setup(
         "Topic :: Multimedia :: Graphics :: Graphics Conversion"
     ],
     description="Read and write life sciences file formats",
+    extras_require={
+        "test": [
+            "pytest"
+        ]
+    },
     install_requires=[
+        "future",
         "javabridge>=1.0"
     ],
     license="GPL License",
@@ -32,5 +38,5 @@ setuptools.setup(
         "bioformats"
     ],
     url="http://github.com/CellProfiler/python-bioformats/",
-    version="1.1.0"
+    version="1.2.0"
 )
