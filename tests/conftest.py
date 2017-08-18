@@ -10,8 +10,6 @@ import bioformats
 def setup_and_teardown():
     log_config = os.path.join(os.path.split(__file__)[0], "resources", "log4j.properties")
 
-    assert os.path.exists(log_config)
-
     javabridge.start_vm(
         args=[
             "-Dlog4j.configuration=file:{}".format(log_config),

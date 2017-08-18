@@ -36,8 +36,8 @@ def test_open_file():
 
 
 def test_open_http():
-    url = "https://github.com/CellProfiler/python-bioformats"+\
-        "/raw/master/bioformats/tests/Channel1-01-A-01.tif"
+    url = "https://github.com/CellProfiler/python-bioformats/raw/39f2aa8360324b4129284d4f647d4f7ee7797518" \
+          "/tests/resources/Channel1-01-A-01.tif"
     image, scale = bioformats.load_image_url(url, rescale=False, wants_max_intensity=True)
     assert image.shape[0] == 640
 
