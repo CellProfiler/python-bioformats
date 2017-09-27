@@ -13,8 +13,13 @@ javabridge.start_vm(class_path=bioformats.JARS,
 try:
     log4j.basic_config()
     if len(sys.argv) < 2:
-        image_path = os.path.join(os.path.dirname(bioformats.__file__), 'tests',
-                                  'Channel1-01-A-01.tif')
+        image_path = os.path.join(
+            os.path.dirname(bioformats.__file__),
+            '..',
+            'tests',
+            'resources',
+            'Channel1-01-A-01.tif'
+        )
     else:
         image_path = sys.argv[1]
     image, scale = bioformats.load_image(image_path, rescale=False,
