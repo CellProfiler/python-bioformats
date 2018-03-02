@@ -674,8 +674,12 @@ class ImageReader(object):
             self.init_reader()
 
     def download(self, url):
-        scheme = urlparse(url).scheme
+        scheme = urlparse(url)[0]
         ext = url[url.rfind("."):]
+        urlpath = urlparse(url)[2]
+        filename = unquote(urlpath.split("/")[-1])
+
+        self.using_temp_file = True
 
         if scheme == 's3':
             client = boto3.client('s3')
@@ -695,9 +699,7 @@ class ImageReader(object):
             os.remove(self.path)
         finally:
             src.close()
-        self.using_temp_file = True
-        urlpath = urlparse(url)[2]
-        filename = unquote(urlpath.split("/")[-1])
+
         return filename
 
     def __enter__(self):
