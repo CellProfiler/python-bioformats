@@ -19,6 +19,7 @@ setuptools.setup(
         ]
     },
     install_requires=[
+        "boto3",
         "future",
         "javabridge>=1.0"
     ],

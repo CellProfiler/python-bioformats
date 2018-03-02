@@ -32,6 +32,7 @@ import errno
 import numpy as np
 import os
 import sys
+import re
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, urlparse, url2pathname
@@ -49,6 +50,7 @@ import javabridge as jutil
 import bioformats
 from . import metadatatools as metadatatools
 import javabridge as javabridge
+import boto3
 
 OMERO_READER_IMPORTED = False
 try:
@@ -607,21 +609,7 @@ class ImageReader(object):
                 #
                 # Other URLS, copy them to a tempfile location
                 #
-                ext = url[url.rfind("."):]
-                src = urlopen(url)
-                dest_fd, self.path = tempfile.mkstemp(suffix=ext)
-                try:
-                    dest = os.fdopen(dest_fd, 'wb')
-                    shutil.copyfileobj(src, dest)
-                except:
-                    src.close()
-                    dest.close()
-                    os.remove(self.path)
-                self.using_temp_file = True
-                src.close()
-                dest.close()
-                urlpath = urlparse(url)[2]
-                filename = unquote(urlpath.split("/")[-1])
+                filename = self.download(url)
         else:
             if sys.platform.startswith("win"):
                 self.path = self.path.replace("/", os.path.sep)
@@ -684,6 +672,33 @@ class ImageReader(object):
         self.rdr.o = jrdr
         if perform_init:
             self.init_reader()
+
+    def download(self, url):
+        scheme = urlparse(url).scheme
+        ext = url[url.rfind("."):]
+
+        if scheme == 's3':
+            client = boto3.client('s3')
+            bucket_name, filename = re.compile('s3://([\w\d\-\.]+)/(.*)').search(url).groups()
+            url = client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_name, 'Key': filename},
+                ExpiresIn=86400
+            )
+
+        src = urlopen(url)
+        dest_fd, self.path = tempfile.mkstemp(suffix=ext)
+        try:
+            with os.fdopen(dest_fd, 'wb') as dest:
+                shutil.copyfileobj(src, dest)
+        except:
+            os.remove(self.path)
+        finally:
+            src.close()
+        self.using_temp_file = True
+        urlpath = urlparse(url)[2]
+        filename = unquote(urlpath.split("/")[-1])
+        return filename
 
     def __enter__(self):
         return self
