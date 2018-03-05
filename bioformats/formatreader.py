@@ -686,8 +686,7 @@ class ImageReader(object):
             bucket_name, key = re.compile('s3://([\w\d\-\.]+)/(.*)').search(url).groups()
             url = client.generate_presigned_url(
                 'get_object',
-                Params={'Bucket': bucket_name, 'Key': key.replace("+", " ")},
-                ExpiresIn=86400
+                Params={'Bucket': bucket_name, 'Key': key.replace("+", " ")}
             )
 
         src = urlopen(url)
