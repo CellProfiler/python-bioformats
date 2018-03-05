@@ -683,10 +683,10 @@ class ImageReader(object):
 
         if scheme == 's3':
             client = boto3.client('s3')
-            bucket_name, filename = re.compile('s3://([\w\d\-\.]+)/(.*)').search(url).groups()
+            bucket_name, key = re.compile('s3://([\w\d\-\.]+)/(.*)').search(url).groups()
             url = client.generate_presigned_url(
                 'get_object',
-                Params={'Bucket': bucket_name, 'Key': filename},
+                Params={'Bucket': bucket_name, 'Key': key.replace("+", " ")},
                 ExpiresIn=86400
             )
 
