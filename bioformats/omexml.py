@@ -622,6 +622,13 @@ class OMEXML(object):
             self.node.set("PhysicalSizeY", str(value))
         PhysicalSizeY = property(get_PhysicalSizeY, set_PhysicalSizeY)
 
+        def get_PhysicalSizeZ(self):
+            '''The size of a voxel in Z direction or None for 2D images.'''
+            return get_float_attr(self.node, "PhysicalSizeZ")
+        def set_PhysicalSizeZ(self, value):
+            self.node.set("PhysicalSizeZ", str(value))
+        PhysicalSizeZ = property(get_PhysicalSizeZ, set_PhysicalSizeZ)
+
         def set_PixelType(self, value):
             self.node.set("Type", value)
         PixelType = property(get_PixelType, set_PixelType)
