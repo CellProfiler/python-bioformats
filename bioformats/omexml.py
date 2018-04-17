@@ -446,8 +446,9 @@ class OMEXML(object):
             '''The OME/Image/Pixels element.
 
             Example:
-            >>> md = bioformats.omexml.OMEXML(xml)
-            >>> pixels = omemetadata.image(i).Pixels
+
+            >>> md = bioformats.OMEXML(bioformats.get_omexml_metadata(filename))
+            >>> pixels = md.image().Pixels
             >>> channel_count = pixels.SizeC
             >>> stack_count = pixels.SizeZ
             >>> timepoint_count = pixels.SizeT
