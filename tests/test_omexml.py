@@ -247,6 +247,10 @@ def test_05_20_pixels_get_physical_size_y(tiff_xml):
     o = bioformats.omexml.OMEXML(tiff_xml)
     assert o.image(0).Pixels.PhysicalSizeY == 352.77777777777777
 
+def test_05_21_pixels_get_physical_size_z(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeZ == 1005.936119563
+
 
 def test_06_01_channel_get_id(tiff_xml):
     o = bioformats.omexml.OMEXML(tiff_xml)
