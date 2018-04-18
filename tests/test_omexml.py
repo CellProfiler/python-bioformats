@@ -251,6 +251,18 @@ def test_05_21_pixels_get_physical_size_z(tiff_xml):
     o = bioformats.omexml.OMEXML(tiff_xml)
     assert o.image(0).Pixels.PhysicalSizeZ == 1005.936119563
 
+def test_05_22_pixels_get_physical_size_unit_x(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeXUnit == "nm"
+
+def test_05_23_pixels_get_physical_size_unit_y(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeYUnit == "nm"
+
+def test_05_24_pixels_get_physical_size_unit_z(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeZUnit == "nm"
+
 
 def test_06_01_channel_get_id(tiff_xml):
     o = bioformats.omexml.OMEXML(tiff_xml)
