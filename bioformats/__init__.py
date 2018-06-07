@@ -12,7 +12,7 @@
 from __future__ import absolute_import, unicode_literals
 
 try:
-    from _version import __version__
+    from ._version import version as __version__
 except ImportError:
     # We're running in a tree that doesn't have a _version.py, so we don't know what our version is.
     __version__ = "0.0.0"

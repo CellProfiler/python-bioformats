@@ -54,7 +54,7 @@ def get_version():
         try:
             import re
             # From http://stackoverflow.com/a/3619714/17498
-            cached_version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+            cached_version = re.search(r"^version = ['\"]([^'\"]*)['\"]",
                                        cached_version_line, re.M).group(1)
         except:
             raise RuntimeError("Unable to find version in %s" % version_file)
