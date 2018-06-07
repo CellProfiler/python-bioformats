@@ -549,7 +549,7 @@ class ImageReader(object):
 
     This class is meant to be harnessed to a scope like this:
 
-    >>> with GetImageReader(path) as reader:
+    >>> with ImageReader(path) as reader:
     >>>     ....
 
     It uses `__enter__` and `__exit__` to manage the random access stream
