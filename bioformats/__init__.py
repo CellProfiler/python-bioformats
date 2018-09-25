@@ -95,4 +95,4 @@ if __name__ == "__main__":
     import wx.py.PyCrust
 
     wx.py.PyCrust.main()
-    J.kill_vm()
+    javabridge.kill_vm()
