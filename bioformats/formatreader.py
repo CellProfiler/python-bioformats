@@ -748,8 +748,8 @@ class ImageReader(object):
                 je, "java/io/FileNotFoundException"):
                 raise IOError(
                     errno.ENOENT,
-                    "The file, \"%s\", does not exist." % path,
-                    path)
+                    "The file, \"%s\", does not exist." % self.path,
+                    self.path)
             e2 = IOError(
                 errno.EINVAL, "Could not load the file as an image (see log for details)",
                 self.path.encode('utf-8'))
