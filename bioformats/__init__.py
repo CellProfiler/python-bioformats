@@ -24,7 +24,7 @@ from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
 
-JAR_VERSION = '5.7.1'
+JAR_VERSION = '5.9.0'
 
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
                           for name in ['loci_tools']]
