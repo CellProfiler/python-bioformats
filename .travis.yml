@@ -19,9 +19,9 @@ deploy:
   user: aether
   password:
     secure: Z88A/qARvvwFdogCnwiybg9g8+FTiJmTKh4rkfoOkFJP02dirWC3lDf8ZEUGo8Uk9QgO+M9BhcJR6vy7STGHYuVF+xC3lz9nuIQj39JkGfHOdy2aUOwiNQLES6jVGEzhJdDv4mJ5Wg481m0ZFGFxzjnAkpVBR2wxCyN80hcOXPc=
-  python: 2.7
+  distributions: "sdist bdist_wheel"
   on:
+    python: 2.7
     tags: true
-    distributions: sdist bdist_wheel
     repo: CellProfiler/python-bioformats
   skip_cleanup: true
