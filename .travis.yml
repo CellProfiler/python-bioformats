@@ -1,24 +1,24 @@
 language: python
 python:
-  - 2.7
-  - 3.5
-  - 3.6
+- 2.7
+- 3.5
+- 3.6
 sudo: false
 notifications:
   email: false
 install:
-  - pip install --upgrade pip wheel
-  - pip install --upgrade numpy
-  - pip install sphinx
-  - pip install --upgrade .[test]
+- pip install --upgrade pip wheel
+- pip install --upgrade numpy
+- pip install sphinx
+- pip install --upgrade .[test]
 script:
-  - pytest
-  - cd docs && make html && cd ..
+- pytest
+- cd docs && make html && cd ..
 deploy:
   provider: pypi
-  user: mcquin
+  user: aether
   password:
-    secure: PrFX2wJrhchChzJD8DX+q7q9UK9zrxl0CN3AdT8kBEIAxzVpM+jCS0Znt7yPHipNjhhvCPtcP2HqmkKuV3o4EgGb/E7BORbKnvBmnLVPcAOpBJXSGxqSXctmPUDlV3FF6Vi2MSTzOIcAPBSqQEB9HBtEUYO34gu2R0dwC3LdrVM=
+    secure: Z88A/qARvvwFdogCnwiybg9g8+FTiJmTKh4rkfoOkFJP02dirWC3lDf8ZEUGo8Uk9QgO+M9BhcJR6vy7STGHYuVF+xC3lz9nuIQj39JkGfHOdy2aUOwiNQLES6jVGEzhJdDv4mJ5Wg481m0ZFGFxzjnAkpVBR2wxCyN80hcOXPc=
   python: 2.7
   on:
     tags: true
