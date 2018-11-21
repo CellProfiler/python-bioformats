@@ -327,6 +327,9 @@ class OMEXML(object):
         if self.ns['ome'] is None:
             raise Exception("Error: String not in OME-XML format")
 
+        # make sure this exists or `get_image_count()` dies
+        self._image_count = None
+
     def __str__(self):
         #
         # need to register the ome namespace because BioFormats expects
@@ -354,7 +357,9 @@ class OMEXML(object):
 
     def get_image_count(self):
         '''The number of images (= series) specified by the XML'''
-        return len(self.root_node.findall(qn(self.ns['ome'], "Image")))
+        if self._image_count is None:
+            self._image_count = len(self.root_node.findall(qn(self.ns['ome'], "Image")))
+        return self._image_count
 
     def set_image_count(self, value):
         '''Add or remove image nodes as needed'''
@@ -364,26 +369,29 @@ class OMEXML(object):
             image_nodes = root.find(qn(self.ns['ome'], "Image"))
             for image_node in image_nodes[value:]:
                 root.remove(image_node)
-        while(self.image_count < value):
-            new_image = self.Image(ElementTree.SubElement(root, qn(self.ns['ome'], "Image")))
-            new_image.ID = str(uuid.uuid4())
-            new_image.Name = "default.png"
-            new_image.AcquisitionDate = xsd_now()
-            new_pixels = self.Pixels(
-                ElementTree.SubElement(new_image.node, qn(self.ns['ome'], "Pixels")))
-            new_pixels.ID = str(uuid.uuid4())
-            new_pixels.DimensionOrder = DO_XYCTZ
-            new_pixels.PixelType = PT_UINT8
-            new_pixels.SizeC = 1
-            new_pixels.SizeT = 1
-            new_pixels.SizeX = 512
-            new_pixels.SizeY = 512
-            new_pixels.SizeZ = 1
-            new_channel = self.Channel(
-                ElementTree.SubElement(new_pixels.node, qn(self.ns['ome'], "Channel")))
-            new_channel.ID = "Channel%d:0" % self.image_count
-            new_channel.Name = new_channel.ID
-            new_channel.SamplesPerPixel = 1
+        if self.image_count < value:
+            for i in range(value - self.image_count):
+                new_image = self.Image(ElementTree.SubElement(root, qn(self.ns['ome'], "Image")))
+                new_image.ID = str(uuid.uuid4())
+                new_image.Name = "default.png"
+                new_image.AcquisitionDate = xsd_now()
+                new_pixels = self.Pixels(
+                    ElementTree.SubElement(new_image.node, qn(self.ns['ome'], "Pixels")))
+                new_pixels.ID = str(uuid.uuid4())
+                new_pixels.DimensionOrder = DO_XYCTZ
+                new_pixels.PixelType = PT_UINT8
+                new_pixels.SizeC = 1
+                new_pixels.SizeT = 1
+                new_pixels.SizeX = 512
+                new_pixels.SizeY = 512
+                new_pixels.SizeZ = 1
+                new_channel = self.Channel(
+                    ElementTree.SubElement(new_pixels.node, qn(self.ns['ome'], "Channel")))
+                new_channel.ID = "Channel%d:0" % (self.image_count + i)
+                new_channel.Name = new_channel.ID
+                new_channel.SamplesPerPixel = 1
+                # force recomputation next time `self.image_count` is accessed
+                self._image_count = None
 
     image_count = property(get_image_count, set_image_count)
 
