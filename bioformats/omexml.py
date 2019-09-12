@@ -1,8 +1,3 @@
-
-# This file is a modified version of the python-bioformats omexml.py file.
-# New and modified sections have been clearly marked below.
-# Tom Fish 2019
-
 # Python-bioformats is distributed under the GNU General Public
 # License, but this file is licensed under the more permissive BSD
 # license.  See the accompanying file LICENSE for details.
@@ -543,7 +538,7 @@ class OMEXML(object):
         SamplesPerPixel = property(get_SamplesPerPixel, set_SamplesPerPixel)
 
     #---------------------
-    # The following section was taken from the Allen Institute for Cell Science version of this file
+    # The following section is from the Allen Institute for Cell Science version of this file
     # which can be found at https://github.com/AllenCellModeling/aicsimageio/blob/master/aicsimageio/vendor/omexml.py
     class TiffData(object):
         """The OME/Image/Pixels/TiffData element
@@ -651,23 +646,13 @@ class OMEXML(object):
 
         DeltaT = property(get_DeltaT, set_DeltaT)
 
-        #-------------
-        # Added 3/9/2019 by Tom Fish
-        def set_ExposureTime(self, value):
-            self.node.set("ExposureTime", str(value))
-
         def get_ExposureTime(self, value):
             self.node.get("ExposureTime")
 
-        #-------------
+        def set_ExposureTime(self, value):
+            self.node.set("ExposureTime", str(value))
 
-        @property
-        def ExposureTime(self):
-            '''Units are seconds. Duration of acquisition????'''
-            exposure_time = self.node.get("ExposureTime")
-            if exposure_time is not None:
-                return float(exposure_time)
-            return None
+        ExposureTime = property(get_ExposureTime, set_ExposureTime)
 
         def get_PositionX(self):
             '''X position of stage'''
@@ -699,8 +684,6 @@ class OMEXML(object):
 
         PositionZ = property(get_PositionZ, set_PositionZ)
 
-        #-------------
-        # Added 3/9/2019 by Tom Fish
         def get_PositionXUnit(self):
             self.node.get("PositionXUnit")
 
@@ -725,7 +708,6 @@ class OMEXML(object):
 
         PositionZUnit = property(get_PositionZUnit, set_PositionZUnit)
 
-        #-------------
     class Pixels(object):
         '''The OME/Image/Pixels element
 
@@ -942,8 +924,9 @@ class OMEXML(object):
             plane = self.node.findall(qn(self.ns['ome'], "Plane"))[index]
             return OMEXML.Plane(plane)
 
-        #-------------
-        # Added 3/9/2019 by Tom Fish
+        def get_tiffdata_count(self):
+            return len(self.node.findall(qn(self.ns['ome'], "TiffData")))
+
         def set_tiffdata_count(self, value):
             assert value >= 0
             tiffdatas = self.node.findall(qn(self.ns['ome'], "TiffData"))
@@ -956,7 +939,6 @@ class OMEXML(object):
         def TiffData(self, index=0):
             data = self.node.findall(qn(self.ns['ome'], "TiffData"))[index]
             return OMEXML.TiffData(data)
-        #-------------
 
     class Instrument(object):
         '''Representation of the OME/Instrument element'''
@@ -1631,8 +1613,6 @@ class OMEXML(object):
 
         ImageRef = property(get_ImageRef, set_ImageRef)
 
-    #-------------
-    # Added 9/9/2019 by Tom Fish
     class ROIRef(object):
 
         def __init__(self, node):
@@ -1645,7 +1625,7 @@ class OMEXML(object):
         def set_ID(self, value):
             '''
             ID will automatically be in the format "ROI:value"
-            and must match the ROI ID (which uses the same
+            and must match the ROI ID (that uses the same
             formatting)
             '''
             self.node.set("ID", "ROI:" + str(value))
@@ -1677,7 +1657,6 @@ class OMEXML(object):
             new_Rectangle.set_TheZ(0)
             new_Rectangle.set_TheC(0)
             new_Rectangle.set_TheT(0)
-
             new_Rectangle.set_StrokeColor(-16776961)  # Default = Red
             new_Rectangle.set_StrokeWidth(20)
             new_Rectangle.set_Text(str(iteration))
@@ -1700,7 +1679,7 @@ class OMEXML(object):
         def set_ID(self, value):
             '''
             ID will automatically be in the format "ROI:value"
-            and must match the ROIRef ID (which uses the same
+            and must match the ROIRef ID (that uses the same
             formatting)
             '''
             self.node.set("ID", "ROI:" + str(value))
@@ -1731,7 +1710,7 @@ class OMEXML(object):
             self.ns = get_namespaces(self.node)
 
         def Rectangle(self, index=0):
-            '''The OME/ROI/Union element. Currenly only rectangle ROIs are available.'''
+            '''The OME/ROI/Union element. Currently only rectangle ROIs are available.'''
             return OMEXML.Rectangle(self.node.find(qn(self.ns['ome'], "Rectangle")))
 
     class Rectangle(object):
@@ -1760,6 +1739,12 @@ class OMEXML(object):
             return self.node.get("StrokeWidth")
 
         def set_StrokeWidth(self, value):
+            '''
+            Colour is set using RGBA to integer conversion calculated using function from:
+            https://docs.openmicroscopy.org/omero/5.5.1/developers/Python.html
+            
+            RGB colours: Red=-16776961, Green=16711935, Blue=65535
+            '''
             self.node.set("StrokeWidth", str(value))
 
         StrokeWidth = property(get_StrokeWidth, set_StrokeWidth)
@@ -1830,4 +1815,3 @@ class OMEXML(object):
             self.node.set("TheT", str(value))
 
         TheT = property(get_TheT, set_TheT)
-    #-------------
