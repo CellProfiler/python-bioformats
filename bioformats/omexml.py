@@ -588,14 +588,14 @@ class OMEXML(object):
 
         IFD = property(get_IFD, set_IFD)
 
-        def get_PlaneCount(self):
+        def get_plane_count(self):
             '''How many planes in this TiffData. Should always be 1'''
             return get_int_attr(self.node, "PlaneCount")
 
-        def set_PlaneCount(self, value):
+        def set_plane_count(self, value):
             self.node.set("PlaneCount", str(value))
 
-        PlaneCount = property(get_PlaneCount, set_PlaneCount)
+        plane_count = property(get_plane_count, set_plane_count)
     #---------------------
 
     class Plane(object):
@@ -647,7 +647,7 @@ class OMEXML(object):
         DeltaT = property(get_DeltaT, set_DeltaT)
 
         def get_ExposureTime(self, value):
-            self.node.get("ExposureTime")
+            return self.node.get("ExposureTime")
 
         def set_ExposureTime(self, value):
             self.node.set("ExposureTime", str(value))
@@ -685,7 +685,7 @@ class OMEXML(object):
         PositionZ = property(get_PositionZ, set_PositionZ)
 
         def get_PositionXUnit(self):
-            self.node.get("PositionXUnit")
+            return self.node.get("PositionXUnit")
 
         def set_PositionXUnit(self, value):
             self.node.set("PositionXUnit", str(value))
@@ -693,7 +693,7 @@ class OMEXML(object):
         PositionXUnit = property(get_PositionXUnit, set_PositionXUnit)
 
         def get_PositionYUnit(self):
-            self.node.get("PositionYUnit")
+            return self.node.get("PositionYUnit")
 
         def set_PositionYUnit(self, value):
             self.node.set("PositionYUnit", str(value))
@@ -701,7 +701,7 @@ class OMEXML(object):
         PositionYUnit = property(get_PositionYUnit, set_PositionYUnit)
 
         def get_PositionZUnit(self):
-            self.node.get("PositionZUnit")
+            return self.node.get("PositionZUnit")
 
         def set_PositionZUnit(self, value):
             self.node.set("PositionZUnit", str(value))
@@ -890,7 +890,7 @@ class OMEXML(object):
             channel = self.node.findall(qn(self.ns['ome'], "Channel"))[index]
             return OMEXML.Channel(channel)
 
-        def get_plane_count(self):
+        def get_PlaneCount(self):
             '''The number of planes in the image
 
             An image with only one plane or an interleaved color plane will
@@ -935,6 +935,8 @@ class OMEXML(object):
             for _ in range(0, value):
                 new_tiffdata = OMEXML.TiffData(
                     ElementTree.SubElement(self.node, qn(self.ns['ome'], "TiffData")))
+
+        tiffdata_count = property(get_tiffdata_count, set_tiffdata_count)
 
         def TiffData(self, index=0):
             data = self.node.findall(qn(self.ns['ome'], "TiffData"))[index]
@@ -1686,13 +1688,13 @@ class OMEXML(object):
 
         ID = property(get_ID, set_ID)
 
-        def get_name(self):
+        def get_Name(self):
             return self.node.get("Name")
 
-        def set_name(self, value):
+        def set_Name(self, value):
             self.node.set("Name", str(value))
 
-        Name = property(get_name, set_name)
+        Name = property(get_Name, set_Name)
 
         @property
         def Union(self):
@@ -1757,37 +1759,37 @@ class OMEXML(object):
 
         Text = property(get_Text, set_Text)
 
-        def get_height(self):
+        def get_Height(self):
             return self.node.get("Height")
 
-        def set_height(self, value):
+        def set_Height(self, value):
             self.node.set("Height", str(value))
 
-        Height = property(get_height, set_height)
+        Height = property(get_Height, set_Height)
 
-        def get_width(self):
+        def get_Width(self):
             return self.node.get("Width")
 
-        def set_width(self, value):
+        def set_Width(self, value):
             self.node.set("Width", str(value))
 
-        Width = property(get_width, set_width)
+        Width = property(get_Width, set_Width)
 
-        def get_x(self):
+        def get_X(self):
             return self.node.get("X")
 
-        def set_x(self, value):
+        def set_X(self, value):
             self.node.set("X", str(value))
 
-        X = property(get_x, set_x)
+        X = property(get_X, set_X)
 
-        def get_y(self):
+        def get_Y(self):
             return self.node.get("Y")
 
-        def set_y(self, value):
+        def set_Y(self, value):
             self.node.set("Y", str(value))
 
-        Y = property(get_y, set_y)
+        Y = property(get_Y, set_Y)
 
         def get_TheZ(self):
             '''The Z index of the plane'''
