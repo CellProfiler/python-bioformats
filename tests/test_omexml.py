@@ -799,7 +799,7 @@ def test_14_10_get_exposure_time(tiff_xml):
     pixels = o.image(0).Pixels
     assert isinstance(pixels, bioformats.omexml.OMEXML.Pixels)
     plane = pixels.Plane(0)
-    assert plane.get_ExposureTime == 0.25
+    assert plane.get_ExposureTime() == 0.25
 
 
 def test_14_11_get_position_x(tiff_xml):
