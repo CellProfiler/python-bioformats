@@ -1624,7 +1624,7 @@ class OMEXML(object):
             self.node = node
             self.ns = get_namespaces(self.node)
 
-        def rectangle(self, index=0):
+        def Rectangle(self):
             '''The OME/ROI/Union element. Currently only rectangle ROIs are available.'''
             return OMEXML.Rectangle(self.node.find(qn(self.ns['ome'], "Rectangle")))
 
