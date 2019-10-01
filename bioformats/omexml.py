@@ -618,7 +618,10 @@ class OMEXML(object):
         DeltaT = property(get_DeltaT, set_DeltaT)
 
         def get_ExposureTime(self, value):
-            return self.node.get("ExposureTime")
+            exposure_time = self.node.get("ExposureTime")
+            if exposure_time is not None:
+                return float(exposure_time)
+            return None
 
         def set_ExposureTime(self, value):
             '''Units are seconds. Duration of acquisition????'''
@@ -835,7 +838,8 @@ class OMEXML(object):
             '''Get the indexed channel from the Pixels element'''
             channel = self.node.findall(qn(self.ns['ome'], "Channel"))[index]
             return OMEXML.Channel(channel)
-
+        channel = Channel
+        
         def get_plane_count(self):
             '''The number of planes in the image
 
@@ -869,7 +873,8 @@ class OMEXML(object):
             '''Get the indexed plane from the Pixels element'''
             plane = self.node.findall(qn(self.ns['ome'], "Plane"))[index]
             return OMEXML.Plane(plane)
-
+        plane = Plane
+        
         def get_tiffdata_count(self):
             return len(self.node.findall(qn(self.ns['ome'], "TiffData")))
 
@@ -884,7 +889,7 @@ class OMEXML(object):
 
         tiffdata_count = property(get_tiffdata_count, set_tiffdata_count)
 
-        def TiffData(self, index=0):
+        def tiffdata(self, index=0):
             data = self.node.findall(qn(self.ns['ome'], "TiffData"))[index]
             return OMEXML.TiffData(data)
 
@@ -1425,6 +1430,8 @@ class OMEXML(object):
 
         def set_Color(self, value):
             self.node.set("Color", str(value))
+            
+        Color = property(get_Color, set_Color)
 
     class WellSampleDucktype(list):
         '''The WellSample elements in a well
@@ -1574,6 +1581,10 @@ class OMEXML(object):
             new_Rectangle.set_y(0)
 
     roi_count = property(get_roi_count, set_roi_count)
+    
+    def roi(self, index=0):
+        '''Return an ROI node by index'''
+        return self.ROI(self.root_node.findall(qn(self.ns['ome'], "ROI"))[index])
 
     class ROI(object):
 
@@ -1607,17 +1618,13 @@ class OMEXML(object):
             '''The OME/ROI/Union element.'''
             return OMEXML.Union(self.node.find(qn(self.ns['ome'], "Union")))
 
-    def roi(self, index=0):
-        '''Return an ROI node by index'''
-        return self.ROI(self.root_node.findall(qn(self.ns['ome'], "ROI"))[index])
-
     class Union(object):
 
         def __init__(self, node):
             self.node = node
             self.ns = get_namespaces(self.node)
 
-        def Rectangle(self, index=0):
+        def rectangle(self, index=0):
             '''The OME/ROI/Union element. Currently only rectangle ROIs are available.'''
             return OMEXML.Rectangle(self.node.find(qn(self.ns['ome'], "Rectangle")))
 
