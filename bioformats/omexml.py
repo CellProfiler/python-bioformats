@@ -1575,10 +1575,10 @@ class OMEXML(object):
             new_Rectangle.set_StrokeColor(-16776961)  # Default = Red
             new_Rectangle.set_StrokeWidth(20)
             new_Rectangle.set_Text(str(iteration))
-            new_Rectangle.set_width(512)
-            new_Rectangle.set_height(512)
-            new_Rectangle.set_x(0)
-            new_Rectangle.set_y(0)
+            new_Rectangle.set_Width(512)
+            new_Rectangle.set_Height(512)
+            new_Rectangle.set_X(0)
+            new_Rectangle.set_Y(0)
 
     roi_count = property(get_roi_count, set_roi_count)
     
