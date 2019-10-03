@@ -617,7 +617,7 @@ class OMEXML(object):
 
         DeltaT = property(get_DeltaT, set_DeltaT)
 
-        def get_ExposureTime(self, value):
+        def get_ExposureTime(self):
             exposure_time = self.node.get("ExposureTime")
             if exposure_time is not None:
                 return float(exposure_time)
