@@ -21,7 +21,7 @@ setuptools.setup(
     install_requires=[
         "boto3",
         "future",
-        "javabridge>=1.0"
+        "python-javabridge"
     ],
     license="GPL License",
     long_description="""Python-bioformats is a Python wrapper for Bio-Formats, a standalone Java library for reading
