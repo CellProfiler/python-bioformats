@@ -43,6 +43,11 @@ NS_DEFAULT = "http://www.openmicroscopy.org/Schemas/{ns_key}/2013-06"
 NS_RE = r"http://www.openmicroscopy.org/Schemas/(?P<ns_key>.*)/[0-9/-]"
 
 default_xml = """<?xml version="1.0" encoding="UTF-8"?>
+<!-- Warning: this comment is an OME-XML metadata block, which contains
+crucial dimensional parameters and other important metadata. Please edit
+cautiously (if at all), and back up the original data before doing so.
+For more information, see the OME-TIFF documentation:
+https://docs.openmicroscopy.org/latest/ome-model/ome-tiff/ -->
 <OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd">
@@ -456,6 +461,26 @@ class OMEXML(object):
             '''
             return OMEXML.Pixels(self.node.find(qn(self.ns['ome'], "Pixels")))
 
+        def roiref(self, index=0):
+            '''The OME/Image/ROIRef element'''
+            return OMEXML.ROIRef(self.node.findall(qn(self.ns['ome'], "ROIRef"))[index])
+
+        def get_roiref_count(self):
+            return len(self.node.findall(qn(self.ns['ome'], "ROIRef")))
+        def set_roiref_count(self, value):
+            '''Add or remove roirefs as needed'''
+            assert value > 0
+            if self.roiref_count > value:
+                roiref_nodes = self.node.find(qn(self.ns['ome'], "ROIRef"))
+                for roiref_node in roiref_nodes[value:]:
+                    self.node.remove(roiref_node)
+            while(self.roiref_count < value):
+                iteration = self.roiref_count - 1
+                new_roiref = OMEXML.ROIRef(ElementTree.SubElement(self.node, qn(self.ns['ome'], "ROIRef")))
+                new_roiref.set_ID("ROI:" + str(iteration))
+
+        roiref_count = property(get_roiref_count, set_roiref_count)
+
     def image(self, index=0):
         '''Return an image node by index'''
         return self.Image(self.root_node.findall(qn(self.ns['ome'], "Image"))[index])
@@ -484,6 +509,66 @@ class OMEXML(object):
         def set_SamplesPerPixel(self, value):
             self.node.set("SamplesPerPixel", str(value))
         SamplesPerPixel = property(get_SamplesPerPixel, set_SamplesPerPixel)
+
+    #---------------------
+    # The following section is from the Allen Institute for Cell Science version of this file
+    # which can be found at https://github.com/AllenCellModeling/aicsimageio/blob/master/aicsimageio/vendor/omexml.py
+    class TiffData(object):
+        """The OME/Image/Pixels/TiffData element
+        <TiffData FirstC="0" FirstT="0" FirstZ="0" IFD="0" PlaneCount="1">
+            <UUID FileName="img40_1.ome.tif">urn:uuid:ef8af211-b6c1-44d4-97de-daca46f16346</UUID>
+        </TiffData>
+        For our purposes, there will be one TiffData per 2-dimensional image plane.
+        """
+
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_FirstZ(self):
+            '''The Z index of the plane'''
+            return get_int_attr(self.node, "FirstZ")
+
+        def set_FirstZ(self, value):
+            self.node.set("FirstZ", str(value))
+
+        FirstZ = property(get_FirstZ, set_FirstZ)
+
+        def get_FirstC(self):
+            '''The channel index of the plane'''
+            return get_int_attr(self.node, "FirstC")
+
+        def set_FirstC(self, value):
+            self.node.set("FirstC", str(value))
+
+        FirstC = property(get_FirstC, set_FirstC)
+
+        def get_FirstT(self):
+            '''The T index of the plane'''
+            return get_int_attr(self.node, "FirstT")
+
+        def set_FirstT(self, value):
+            self.node.set("FirstT", str(value))
+
+        FirstT = property(get_FirstT, set_FirstT)
+
+        def get_IFD(self):
+            '''plane index within tiff file'''
+            return get_int_attr(self.node, "IFD")
+
+        def set_IFD(self, value):
+            self.node.set("IFD", str(value))
+
+        IFD = property(get_IFD, set_IFD)
+
+        def get_plane_count(self):
+            '''How many planes in this TiffData. Should always be 1'''
+            return get_int_attr(self.node, "PlaneCount")
+
+        def set_plane_count(self, value):
+            self.node.set("PlaneCount", str(value))
+
+        plane_count = property(get_plane_count, set_plane_count)
 
     class Plane(object):
         '''The OME/Image/Pixels/Plane element
@@ -532,13 +617,17 @@ class OMEXML(object):
 
         DeltaT = property(get_DeltaT, set_DeltaT)
 
-        @property
-        def ExposureTime(self):
-            '''Units are seconds. Duration of acquisition????'''
+        def get_ExposureTime(self):
             exposure_time = self.node.get("ExposureTime")
             if exposure_time is not None:
                 return float(exposure_time)
             return None
+
+        def set_ExposureTime(self, value):
+            '''Units are seconds. Duration of acquisition????'''
+            self.node.set("ExposureTime", str(value))
+
+        ExposureTime = property(get_ExposureTime, set_ExposureTime)
 
         def get_PositionX(self):
             '''X position of stage'''
@@ -569,6 +658,30 @@ class OMEXML(object):
             self.node.set("PositionZ", str(value))
 
         PositionZ = property(get_PositionZ, set_PositionZ)
+
+        def get_PositionXUnit(self):
+            return self.node.get("PositionXUnit")
+
+        def set_PositionXUnit(self, value):
+            self.node.set("PositionXUnit", str(value))
+
+        PositionXUnit = property(get_PositionXUnit, set_PositionXUnit)
+
+        def get_PositionYUnit(self):
+            return self.node.get("PositionYUnit")
+
+        def set_PositionYUnit(self, value):
+            self.node.set("PositionYUnit", str(value))
+
+        PositionYUnit = property(get_PositionYUnit, set_PositionYUnit)
+
+        def get_PositionZUnit(self):
+            return self.node.get("PositionZUnit")
+
+        def set_PositionZUnit(self, value):
+            self.node.set("PositionZUnit", str(value))
+
+        PositionZUnit = property(get_PositionZUnit, set_PositionZUnit)
 
     class Pixels(object):
         '''The OME/Image/Pixels element
@@ -725,7 +838,8 @@ class OMEXML(object):
             '''Get the indexed channel from the Pixels element'''
             channel = self.node.findall(qn(self.ns['ome'], "Channel"))[index]
             return OMEXML.Channel(channel)
-
+        channel = Channel
+        
         def get_plane_count(self):
             '''The number of planes in the image
 
@@ -759,6 +873,25 @@ class OMEXML(object):
             '''Get the indexed plane from the Pixels element'''
             plane = self.node.findall(qn(self.ns['ome'], "Plane"))[index]
             return OMEXML.Plane(plane)
+        plane = Plane
+        
+        def get_tiffdata_count(self):
+            return len(self.node.findall(qn(self.ns['ome'], "TiffData")))
+
+        def set_tiffdata_count(self, value):
+            assert value >= 0
+            tiffdatas = self.node.findall(qn(self.ns['ome'], "TiffData"))
+            for td in tiffdatas:
+                self.node.remove(td)
+            for _ in range(0, value):
+                new_tiffdata = OMEXML.TiffData(
+                    ElementTree.SubElement(self.node, qn(self.ns['ome'], "TiffData")))
+
+        tiffdata_count = property(get_tiffdata_count, set_tiffdata_count)
+
+        def tiffdata(self, index=0):
+            data = self.node.findall(qn(self.ns['ome'], "TiffData"))[index]
+            return OMEXML.TiffData(data)
 
     class Instrument(object):
         '''Representation of the OME/Instrument element'''
@@ -1297,6 +1430,8 @@ class OMEXML(object):
 
         def set_Color(self, value):
             self.node.set("Color", str(value))
+            
+        Color = property(get_Color, set_Color)
 
     class WellSampleDucktype(list):
         '''The WellSample elements in a well
@@ -1393,3 +1528,205 @@ class OMEXML(object):
             ref.set("ID", value)
         ImageRef = property(get_ImageRef, set_ImageRef)
 
+    class ROIRef(object):
+
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_ID(self):
+            return self.node.get("ID")
+
+        def set_ID(self, value):
+            '''
+            ID will automatically be in the format "ROI:value"
+            and must match the ROI ID (that uses the same
+            formatting)
+            '''
+            self.node.set("ID", "ROI:" + str(value))
+
+        ID = property(get_ID, set_ID)
+
+    def get_roi_count(self):
+        return len(self.root_node.findall(qn(self.ns['ome'], "ROI")))
+
+    def set_roi_count(self, value):
+        '''Add or remove roi nodes as needed'''
+        assert value > 0
+        root = self.root_node
+        if self.roi_count > value:
+            roi_nodes = root.find(qn(self.ns['ome'], "ROI"))
+            for roi_node in roi_nodes[value:]:
+                root.remove(roi_node)
+        while(self.roi_count < value):
+            iteration = self.roi_count - 1
+
+            new_roi = self.ROI(ElementTree.SubElement(root, qn(self.ns['ome'], "ROI")))
+            new_roi.ID = str(iteration)
+            new_roi.Name = "Marker " + str(iteration)
+            new_Union = self.Union(
+                ElementTree.SubElement(new_roi.node, qn(self.ns['ome'], "Union")))
+            new_Rectangle = self.Rectangle(
+                ElementTree.SubElement(new_Union.node, qn(self.ns['ome'], "Rectangle")))
+            new_Rectangle.set_ID("Shape:" + str(iteration) + ":0")
+            new_Rectangle.set_TheZ(0)
+            new_Rectangle.set_TheC(0)
+            new_Rectangle.set_TheT(0)
+            new_Rectangle.set_StrokeColor(-16776961)  # Default = Red
+            new_Rectangle.set_StrokeWidth(20)
+            new_Rectangle.set_Text(str(iteration))
+            new_Rectangle.set_Width(512)
+            new_Rectangle.set_Height(512)
+            new_Rectangle.set_X(0)
+            new_Rectangle.set_Y(0)
+
+    roi_count = property(get_roi_count, set_roi_count)
+    
+    def roi(self, index=0):
+        '''Return an ROI node by index'''
+        return self.ROI(self.root_node.findall(qn(self.ns['ome'], "ROI"))[index])
+
+    class ROI(object):
+
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_ID(self):
+            return self.node.get("ID")
+
+        def set_ID(self, value):
+            '''
+            ID will automatically be in the format "ROI:value"
+            and must match the ROIRef ID (that uses the same
+            formatting)
+            '''
+            self.node.set("ID", "ROI:" + str(value))
+
+        ID = property(get_ID, set_ID)
+
+        def get_Name(self):
+            return self.node.get("Name")
+
+        def set_Name(self, value):
+            self.node.set("Name", str(value))
+
+        Name = property(get_Name, set_Name)
+
+        @property
+        def Union(self):
+            '''The OME/ROI/Union element.'''
+            return OMEXML.Union(self.node.find(qn(self.ns['ome'], "Union")))
+
+    class Union(object):
+
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def Rectangle(self):
+            '''The OME/ROI/Union element. Currently only rectangle ROIs are available.'''
+            return OMEXML.Rectangle(self.node.find(qn(self.ns['ome'], "Rectangle")))
+
+    class Rectangle(object):
+
+        def __init__(self, node):
+            self.node = node
+            self.ns = get_namespaces(self.node)
+
+        def get_ID(self):
+            return self.node.get("ID")
+
+        def set_ID(self, value):
+            self.node.set("ID", str(value))
+
+        ID = property(get_ID, set_ID)
+
+        def get_StrokeColor(self):
+            return self.node.get("StrokeColor")
+
+        def set_StrokeColor(self, value):
+            self.node.set("StrokeColor", str(value))
+
+        StrokeColor = property(get_StrokeColor, set_StrokeColor)
+
+        def get_StrokeWidth(self):
+            return self.node.get("StrokeWidth")
+
+        def set_StrokeWidth(self, value):
+            '''
+            Colour is set using RGBA to integer conversion calculated using function from:
+            https://docs.openmicroscopy.org/omero/5.5.1/developers/Python.html
+            
+            RGB colours: Red=-16776961, Green=16711935, Blue=65535
+            '''
+            self.node.set("StrokeWidth", str(value))
+
+        StrokeWidth = property(get_StrokeWidth, set_StrokeWidth)
+
+        def get_Text(self):
+            return self.node.get("Text")
+
+        def set_Text(self, value):
+            self.node.set("Text", str(value))
+
+        Text = property(get_Text, set_Text)
+
+        def get_Height(self):
+            return self.node.get("Height")
+
+        def set_Height(self, value):
+            self.node.set("Height", str(value))
+
+        Height = property(get_Height, set_Height)
+
+        def get_Width(self):
+            return self.node.get("Width")
+
+        def set_Width(self, value):
+            self.node.set("Width", str(value))
+
+        Width = property(get_Width, set_Width)
+
+        def get_X(self):
+            return self.node.get("X")
+
+        def set_X(self, value):
+            self.node.set("X", str(value))
+
+        X = property(get_X, set_X)
+
+        def get_Y(self):
+            return self.node.get("Y")
+
+        def set_Y(self, value):
+            self.node.set("Y", str(value))
+
+        Y = property(get_Y, set_Y)
+
+        def get_TheZ(self):
+            '''The Z index of the plane'''
+            return get_int_attr(self.node, "TheZ")
+
+        def set_TheZ(self, value):
+            self.node.set("TheZ", str(value))
+
+        TheZ = property(get_TheZ, set_TheZ)
+
+        def get_TheC(self):
+            '''The channel index of the plane'''
+            return get_int_attr(self.node, "TheC")
+
+        def set_TheC(self, value):
+            self.node.set("TheC", str(value))
+
+        TheC = property(get_TheC, set_TheC)
+
+        def get_TheT(self):
+            '''The T index of the plane'''
+            return get_int_attr(self.node, "TheT")
+
+        def set_TheT(self, value):
+            self.node.set("TheT", str(value))
+
+        TheT = property(get_TheT, set_TheT)
