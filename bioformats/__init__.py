@@ -24,10 +24,10 @@ from . import formatwriter as _formatwriter
 
 _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
 
-JAR_VERSION = '5.9.0'
+JAR_VERSION = '6.5.1'
 
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
-                          for name in ['loci_tools']]
+                          for name in ['bioformats_package']]
 """List of directories, jar files, and zip files that should be added
 to the Java virtual machine's class path."""
 
