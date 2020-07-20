@@ -15,12 +15,11 @@ setuptools.setup(
     description="Read and write life sciences file formats",
     extras_require={
         "test": [
-            "pytest"
+            "pytest>=3.3.2,<4"
         ]
     },
     install_requires=[
-        "boto3",
-        "future",
+        "future>=0.18.2",
         "python-javabridge>=4.0.0rc2"
     ],
     license="GPL License",
