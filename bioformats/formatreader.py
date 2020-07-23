@@ -122,13 +122,53 @@ def make_iformat_reader_class():
         """
         close = jutil.make_method('close', '()V',
                                   'Close the currently open file and free memory')
-        getDimensionOrder = jutil.make_method('getDimensionOrder',
-                                              '()Ljava/lang/String;',
-                                              'Return the dimension order as a five-character string, e.g. "XYCZT"')
+
+        set_resolution_doc = """
+        Set the resolution level.
+        """
+
+        # void setResolution(int resolution)
+        setResolution = jutil.make_method(
+            'setResolution',
+            '()I',
+            set_resolution_doc
+        )
+
+        get_resolution_count_doc = """
+        Return the number of resolutions for the current series. Resolutions
+        are stored in descending order, so the largest resolution is first
+        and the smallest resolution is last.
+        """
+
+        # int getResolutionCount()
+        getResolutionCount = jutil.make_method(
+            'getResolutionCount',
+            '()I',
+            get_resolution_count_doc
+        )
+
+        set_flattened_resolutions_doc = """
+        Set whether or not to flatten resolutions into individual series.
+        """
+
+        # void setFlattenedResolutions(boolean flatten)
+        setFlattenedResolutions = jutil.make_method(
+            'setFlattenedResolutions',
+            '(Ljava/lang/Boolean;)V',
+            set_flattened_resolutions_doc
+        )
+
+        getDimensionOrder = jutil.make_method(
+            'getDimensionOrder',
+            '()Ljava/lang/String;',
+            'Return the dimension order as a five-character string, e.g. "XYCZT"'
+        )
+
         getGlobalMetadata = jutil.make_method('getGlobalMetadata',
                                               '()Ljava/util/Hashtable;',
                                               'Obtains the hashtable containing the global metadata field/value pairs')
         getMetadata = getGlobalMetadata
+
         getMetadataValue = jutil.make_method('getMetadataValue',
                                              '(Ljava/lang/String;)'
                                              'Ljava/lang/Object;',
