@@ -6,3 +6,4 @@
 /bioformats/_version.py
 \.eggs/
 \.idea/
+venv
