@@ -39,8 +39,5 @@ setuptools.setup(
         "bioformats"
     ],
     url="http://github.com/CellProfiler/python-bioformats/",
-    setup_requires = ['setuptools_scm'],
-    use_scm_version = {
-        "write_to": "bioformats/_version.py",
-    },
+    version="4.0.0"
 )
