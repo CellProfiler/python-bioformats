@@ -21,7 +21,7 @@ setuptools.setup(
     install_requires=[
         "boto3>=1.14.23",
         "future>=0.18.2",
-        "python-javabridge==4.0.1"
+        "python-javabridge==4.0.2"
     ],
     license="GPL License",
     long_description="""Python-bioformats is a Python wrapper for Bio-Formats, a standalone Java library for reading
@@ -39,5 +39,5 @@ setuptools.setup(
         "bioformats"
     ],
     url="http://github.com/CellProfiler/python-bioformats/",
-    version="4.0.2"
+    version="4.0.3"
 )
