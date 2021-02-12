@@ -32,17 +32,29 @@ JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'
 to the Java virtual machine's class path."""
 
 # See http://www.loci.wisc.edu/software/bio-formats
-READABLE_FORMATS = ('al3d', 'am', 'amiramesh', 'apl', 'arf', 'avi', 'bmp',
-                    'c01', 'cfg', 'cxd', 'dat', 'dcm', 'dicom', 'dm3', 'dv',
-                    'eps', 'epsi', 'fits', 'flex', 'fli', 'gel', 'gif', 'grey',
-                    'hdr', 'html', 'hx', 'ics', 'ids', 'img', 'ims', 'ipl',
-                    'ipm', 'ipw', 'jp2', 'jpeg', 'jpg', 'l2d', 'labels', 'lei',
-                    'lif', 'liff', 'lim', 'lsm', 'mdb', 'mnc', 'mng', 'mov',
-                    'mrc', 'mrw', 'mtb', 'naf', 'nd', 'nd2', 'nef', 'nhdr',
-                    'nrrd', 'obsep', 'oib', 'oif', 'ome', 'ome.tiff', 'pcx',
-                    'pgm', 'pic', 'pict', 'png', 'ps', 'psd', 'r3d', 'raw',
-                    'scn', 'sdt', 'seq', 'sld', 'stk', 'svs', 'tif', 'tiff',
-                    'tnb', 'txt', 'vws', 'xdce', 'xml', 'xv', 'xys', 'zvi')
+READABLE_FORMATS = ('1sc', '2fl', 'acff', 'afi', 'afm', 'aim', 'al3d', 'ali',
+                    'am', 'amiramesh', 'apl', 'arf', 'avi', 'bif', 'bin', 'bip',
+                    'bmp', 'btf', 'c01', 'cfg', 'ch5', 'cif', 'cr2', 'crw', 
+                    'cxd', 'czi', 'dat', 'dcm', 'dib', 'dicom', 'dm2', 'dm3',
+                    'dm4', 'dti', 'dv', 'eps', 'epsi', 'exp', 'fdf', 'fff',
+                    'ffr', 'fits', 'flex', 'fli', 'frm', 'gel', 'gif', 'grey',
+                    'h5', 'hdf', 'hdr', 'hed', 'his', 'htd', 'html', 'hx', 'i2i',
+                    'ics', 'ids', 'im3', 'img', 'ims', 'inr', 'ipl', 'ipm', 'ipw',
+                    'j2k', 'jp2', 'jpeg', 'jpf', 'jpg', 'jpk', 'jpx', 'klb',
+                    'l2d', 'labels', 'lei', 'lif', 'liff', 'lim', 'lms', 'lsm',
+                    'map', 'mdb', 'mea', 'mnc', 'mng', 'mod', 'mov', 'mrc', 'mrcs',
+                    'mrw', 'msr', 'mtb', 'mvd2', 'naf', 'nd', 'nd2', 'ndpi', 'ndpis',
+                    'nef', 'nhdr', 'nii', 'nii.gz', 'nrrd', 'obf', 'obsep', 'oib',
+                    'oif', 'oir', 'ome', 'ome.btf', 'ome.tf2', 'ome.tf8', 'ome.tif',
+                    'ome.tiff', 'ome.xml', 'par', 'pbm', 'pcoraw', 'pcx', 'pds',
+                    'pgm', 'pic', 'pict', 'png', 'pnl', 'ppm', 'pr3', 'ps', 'psd',
+                    'qptiff', 'r3d', 'raw', 'rcpnl', 'rec', 'res', 'scn', 'sdt',
+                    'seq', 'sif', 'sld', 'sm2', 'sm3', 'spc', 'spe', 'spi', 'st',
+                    'stk', 'stp', 'svs', 'sxm', 'tc.', 'tf2', 'tf8', 'tfr', 'tga',
+                    'tif', 'tiff', 'tnb', 'top', 'txt', 'v', 'vff', 'vms', 'vsi',
+                    'vws', 'wat', 'wlz', 'wpi', 'xdce', 'xml', 'xqd', 'xqf', 'xv',
+                    'xys', 'zfp', 'zfr', 'zvi')
+
 WRITABLE_FORMATS = ('avi', 'eps', 'epsi', 'ics', 'ids', 'jp2', 'jpeg', 'jpg',
                     'mov', 'ome', 'ome.tiff', 'png', 'ps', 'tif', 'tiff')
 
