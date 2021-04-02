@@ -593,7 +593,7 @@ class ImageReader(object):
                             omero_logout()
                             omero_login()
                         else:
-                            logger.warn(e.message)
+                            logger.warn(e)
                             for line in traceback.format_exc().split("\n"):
                                 logger.warn(line)
                             if jutil.is_instance_of(
@@ -732,7 +732,7 @@ class ImageReader(object):
         try:
             self.rdr.setId(self.path)
         except jutil.JavaException as e:
-            logger.warn(e.message)
+            logger.warn(e)
             for line in traceback.format_exc().split("\n"):
                 logger.warn(line)
             je = e.throwable
