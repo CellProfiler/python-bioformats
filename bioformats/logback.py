@@ -9,6 +9,6 @@ import javabridge
 
 def basic_config():
     '''Configure logging for "WARN" level'''
-    log4j = javabridge.JClassWrapper("loci.common.Log4jTools")
-    log4j.enableLogging()
-    log4j.setRootLevel("WARN")
+    logback = javabridge.JClassWrapper("loci.common.LogbackTools")
+    logback.enableLogging()
+    logback.setRootLevel("WARN")
