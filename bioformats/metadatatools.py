@@ -36,7 +36,7 @@ class MetadataStore(object):
         imageIndex - index of the image in question from IFormatReader.get_index?
         binDataIndex - ???
         '''
-        # Post loci_tools 4.2
+        # Post v 4.2
         try:
             jutil.call(self.o, 'setPixelsBinDataBigEndian',
                        '(Ljava/lang/Boolean;II)V',
@@ -47,7 +47,7 @@ class MetadataStore(object):
 
     def setPixelsDimensionOrder(self, dimension_order, imageIndex, binDataIndex):
         '''Set the dimension order for a series'''
-        # Post loci_tools 4.2 - use ome.xml.model.DimensionOrder
+        # Post v 4.2 - use ome.xml.model.DimensionOrder
         try:
             jdimension_order = jutil.static_call(
                 'ome/xml/model/enums/DimensionOrder', 'fromString',
