@@ -245,7 +245,7 @@ def make_iformat_reader_class():
 def get_class_list():
     '''Return a wrapped instance of loci.formats.ClassList'''
     #
-    # This uses the reader.txt file from inside the loci_tools.jar
+    # This uses the reader.txt file from inside the jar
     #
     class ClassList(object):
         remove_class = jutil.make_method(

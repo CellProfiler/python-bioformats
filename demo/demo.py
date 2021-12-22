@@ -5,13 +5,13 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os
 import javabridge
 import bioformats
-from bioformats import log4j
+from bioformats import logback
 import sys
 
 javabridge.start_vm(class_path=bioformats.JARS,
                     run_headless=True)
 try:
-    log4j.basic_config()
+    logback.basic_config()
     if len(sys.argv) < 2:
         image_path = os.path.join(
             os.path.dirname(bioformats.__file__),

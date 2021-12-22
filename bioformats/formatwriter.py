@@ -208,7 +208,7 @@ def make_image_writer_class():
     base_klass = env.find_class('loci/formats/IFormatWriter')
     IFormatWriter = make_iformat_writer_class(class_name)
     #
-    # This uses the writers.txt file from inside the loci_tools.jar
+    # This uses the writers.txt file from inside jar
     #
     class_list = jutil.make_instance("loci/formats/ClassList",
                                      "(Ljava/lang/String;"
