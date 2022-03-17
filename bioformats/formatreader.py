@@ -799,7 +799,9 @@ class ImageReader(object):
             index = self.rdr.getIndex(z,0,t)
             image = np.frombuffer(openBytes_func(index), dtype)
             image.shape = (height, width, self.rdr.getSizeC())
-            if image.shape[2] > 3:
+            if c is not None and len(image.shape) > 2:
+                image = image[:, :, c]
+            elif image.shape[2] > 3:
                 image = image[:, :, :3]
         elif c is not None and self.rdr.getRGBChannelCount() == 1:
             index = self.rdr.getIndex(z,c,t)
@@ -830,10 +832,12 @@ class ImageReader(object):
                       for i in range(self.rdr.getSizeC())]
             image = np.dstack(images)
             image.shape = (height, width, self.rdr.getSizeC())
-            if not channel_names is None:
+            if channel_names is not None:
                 metadata = metadatatools.MetadataRetrieve(self.metadata)
                 for i in range(self.rdr.getSizeC()):
-                    index = self.rdr.getIndex(z, 0, t)
+                    # Indexing to get channel names can be unreliable.
+                    # Assume all images in the series have the same names?
+                    index = self.rdr.getIndex(0, 0, 0)
                     channel_name = metadata.getChannelName(index, i)
                     if channel_name is None:
                         channel_name = metadata.getChannelID(index, i)
