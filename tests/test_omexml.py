@@ -239,6 +239,30 @@ def test_05_18_pixels_set_channel_count(tiff_xml):
     o.image(0).Pixels.channel_count = 2
     assert len(o.image(0).Pixels.node.findall(bioformats.omexml.qn(o.get_ns("ome"), "Channel"))) == 2
 
+def test_05_19_pixels_get_physical_size_x(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeX == 352.77777777777777
+
+def test_05_20_pixels_get_physical_size_y(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeY == 352.77777777777777
+
+def test_05_21_pixels_get_physical_size_z(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeZ == 1005.936119563
+
+def test_05_22_pixels_get_physical_size_unit_x(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeXUnit == "nm"
+
+def test_05_23_pixels_get_physical_size_unit_y(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeYUnit == "nm"
+
+def test_05_24_pixels_get_physical_size_unit_z(tiff_xml):
+    o = bioformats.omexml.OMEXML(tiff_xml)
+    assert o.image(0).Pixels.PhysicalSizeZUnit == "nm"
+
 
 def test_06_01_channel_get_id(tiff_xml):
     o = bioformats.omexml.OMEXML(tiff_xml)
