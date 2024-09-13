@@ -42,5 +42,5 @@ setuptools.setup(
         "bioformats"
     ],
     url="http://github.com/CellProfiler/python-bioformats/",
-    version="4.0.8"
+    version="4.1.0"
 )
