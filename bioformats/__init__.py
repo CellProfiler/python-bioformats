@@ -26,10 +26,14 @@ _jars_dir = os.path.join(os.path.dirname(__file__), 'jars')
 
 JAR_VERSION = '6.5.1'
 
+# directories, jar and zip files to be added to the JVM's class path:
 JARS = javabridge.JARS + [os.path.realpath(os.path.join(_jars_dir, name + '.jar'))
                           for name in ['bioformats_package']]
-"""List of directories, jar files, and zip files that should be added
-to the Java virtual machine's class path."""
+
+# add the 3i SlideBook reader jar if present:
+_sld6 = os.path.realpath(os.path.join(_jars_dir, 'SlideBook6Reader.jar'))
+if os.path.exists(_sld6):
+    JARS.append(_sld6)
 
 # See http://www.loci.wisc.edu/software/bio-formats
 READABLE_FORMATS = ('1sc', '2fl', 'acff', 'afi', 'afm', 'aim', 'al3d', 'ali',
