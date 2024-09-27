@@ -556,8 +556,7 @@ class ImageReader(object):
     that can be used to cache the file contents in memory.
 
     '''
-
-    def __init__(self, path=None, url=None, perform_init=True):
+    def __init__(self, path=None, url=None, perform_init=True, allow_open_files=True):
         self.stream = None
         file_scheme = "file:"
         self.using_temp_file = False
@@ -621,54 +620,20 @@ class ImageReader(object):
                 "The file, \"%s\", does not exist." % path,
                 path)
 
-        self.stream = jutil.make_instance('loci/common/RandomAccessInputStream',
-                                          '(Ljava/lang/String;)V',
-                                          self.path)
-
         self.rdr = None
-        class_list = get_class_list()
+        IFormatReader = make_iformat_reader_class()
+        self.rdr = IFormatReader()
         find_rdr_script = """
-        var classes = class_list.getClasses();
-        var rdr = null;
-        var lc_filename = java.lang.String(filename.toLowerCase());
-        for (pass=0; pass < 3; pass++) {
-            for (class_idx in classes) {
-                var maybe_rdr = classes[class_idx].newInstance();
-                if (pass == 0) {
-                    if (maybe_rdr.isThisType(filename, false)) {
-                        rdr = maybe_rdr;
-                        break;
-                    }
-                    continue;
-                } else if (pass == 1) {
-                    var suffixes = maybe_rdr.getSuffixes();
-                    var suffix_found = false;
-                    for (suffix_idx in suffixes) {
-                        var suffix = java.lang.String(suffixes[suffix_idx]);
-                        suffix = suffix.toLowerCase();
-                        if (lc_filename.endsWith(suffix)) {
-                            suffix_found = true;
-                            break;
-                        }
-                    }
-                    if (! suffix_found) continue;
-                }
-                if (maybe_rdr.isThisType(stream)) {
-                    rdr = maybe_rdr;
-                    break;
-                }
-            }
-            if (rdr) break;
-        }
+        importClass(Packages.loci.formats.ImageReader);
+        var reader = new ImageReader();
+        reader.setAllowOpenFiles(allow_open_files);
+        var rdr = reader.getReader(filename);
         rdr;
         """
-        IFormatReader = make_iformat_reader_class()
-        jrdr = jutil.run_script(find_rdr_script, dict(class_list = class_list,
-                                                      filename = filename,
-                                                      stream = self.stream))
+        jrdr = jutil.run_script(find_rdr_script, dict(filename=self.path.lower(),
+                                                      allow_open_files=allow_open_files))
         if jrdr is None:
             raise ValueError("Could not find a Bio-Formats reader for %s", self.path)
-        self.rdr = IFormatReader()
         self.rdr.o = jrdr
         if perform_init:
             self.init_reader()
@@ -834,7 +799,9 @@ class ImageReader(object):
             index = self.rdr.getIndex(z,0,t)
             image = np.frombuffer(openBytes_func(index), dtype)
             image.shape = (height, width, self.rdr.getSizeC())
-            if image.shape[2] > 3:
+            if c is not None and len(image.shape) > 2:
+                image = image[:, :, c]
+            elif image.shape[2] > 3:
                 image = image[:, :, :3]
         elif c is not None and self.rdr.getRGBChannelCount() == 1:
             index = self.rdr.getIndex(z,c,t)
@@ -865,10 +832,12 @@ class ImageReader(object):
                       for i in range(self.rdr.getSizeC())]
             image = np.dstack(images)
             image.shape = (height, width, self.rdr.getSizeC())
-            if not channel_names is None:
+            if channel_names is not None:
                 metadata = metadatatools.MetadataRetrieve(self.metadata)
                 for i in range(self.rdr.getSizeC()):
-                    index = self.rdr.getIndex(z, 0, t)
+                    # Indexing to get channel names can be unreliable.
+                    # Assume all images in the series have the same names?
+                    index = self.rdr.getIndex(0, 0, 0)
                     channel_name = metadata.getChannelName(index, i)
                     if channel_name is None:
                         channel_name = metadata.getChannelID(index, i)
@@ -929,13 +898,21 @@ __image_reader_key_cache = {}
 # The image reader cache associates path/url with a reader
 __image_reader_cache = {}
 
-def get_image_reader(key, path=None, url=None):
+
+def get_image_reader(key, path=None, url=None, allow_open_files=True):
     '''Make or find an image reader appropriate for the given path
 
     path - pathname to the reader on disk.
 
     key - use this key to keep only a single cache member associated with
           that key open at a time.
+
+    allow_open_files - boolean. If True, bioformats is allowed to open file headers
+                       to determine which reader to use. If False, only the file
+                       extension can be used to pick a reader. Note that opening
+                       files is absolutely required to properly detect some formats,
+                       most notably OME-TIF. When only using extensions data can
+                       be incorrect if the wrong reader is selected.
     '''
     logger.debug("Getting image reader for: %s, %s, %s" % (key, path, url))
     if key in __image_reader_key_cache:
@@ -958,7 +935,7 @@ def get_image_reader(key, path=None, url=None):
             rdr = OmeroReader(__omero_server, __omero_session_id, url=url)
         else:
             logger.debug("Falling back to Java reader.")
-            rdr = ImageReader(path=path, url=url)
+            rdr = ImageReader(path=path, url=url, allow_open_files=allow_open_files)
         old_count = 0
     __image_reader_cache[path, url] = (old_count+1, rdr)
     __image_reader_key_cache[key] = (path, url)
