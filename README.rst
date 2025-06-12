@@ -1,4 +1,4 @@
-|Travis CI Status|
+NOTE: We have not archived this repository to allow us to make rare, mandatory updates for our own internal use, however it is not actively maintained and should be considered archived.
 
 -----------------------------------------------------------------------------------------------------
 
