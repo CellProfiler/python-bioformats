@@ -821,15 +821,12 @@ class ImageReader(object):
                 logger.warning("WARNING: failed to get MaxSampleValue for image. Intensities may be improperly scaled.")
         if index is not None:
             image = np.frombuffer(openBytes_func(index), dtype)
-            if len(image) / height / width in (3,4):
-                n_channels = int(len(image) / height / width)
-                if self.rdr.isInterleaved():
-                    image.shape = (height, width, n_channels)
-                else:
-                    image.shape = (n_channels, height, width)
-                    image = image.transpose(1, 2, 0)
+            n_channels = int(len(image) / height / width)
+            if self.rdr.isInterleaved():
+                image.shape = (height, width, n_channels)
             else:
-                image.shape = (height, width)
+                image.shape = (n_channels, height, width)
+                image = image.transpose(1, 2, 0)
         elif self.rdr.isRGB() and self.rdr.isInterleaved():
             index = self.rdr.getIndex(z,0,t)
             image = np.frombuffer(openBytes_func(index), dtype)
